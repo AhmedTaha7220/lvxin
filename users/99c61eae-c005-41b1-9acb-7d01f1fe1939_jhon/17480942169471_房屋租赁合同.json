@@ -1,0 +1,9 @@
+[
+  {
+    "Message": "抱歉，不支持一次超过30个的审核规则数量",
+    "RequestId": "E31926F2-AF46-5787-B50B-D0438FAAF654",
+    "Code": "Request.Params.Rules.Size.Error",
+    "Success": false,
+    "httpStatusCode": "400"
+  }
+]

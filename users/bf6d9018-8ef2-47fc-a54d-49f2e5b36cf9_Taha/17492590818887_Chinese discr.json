@@ -1,0 +1,223 @@
+[
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "C885DBCC-AB03-5866-9E7E-896C27107A07",
+    "Output": {
+      "result": {
+        "examineResult": "此处无需修改",
+        "ruleTag": "简要审查合同的主要条款",
+        "ruleTitle": "在合同形式与生效条款中，合同生效与签订日期审查",
+        "examineBrief": "本任务为审查合同的生效与签订日期，确保其符合法律效力的要求。合同中明确了生效日期和签订日期，且签订日期准确完整。因此，合同文本在此方面不存在缺陷或风险，无需进行修改。",
+        "riskLevel": "normal",
+        "subRisks": [
+          {
+            "resultType": "通过"
+          }
+        ],
+        "ruleSequence": "2.4"
+      },
+      "resultTaskId": "c30f53be-8892-4aa0-b39d-29d9af139ba9"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "C885DBCC-AB03-5866-9E7E-896C27107A07",
+    "Output": {
+      "result": {
+        "examineResult": "此处无需修改",
+        "ruleTag": "简要审查合同主体及合法性",
+        "ruleTitle": "在合同法律引用条款中，确保引用法律文件名称的准确性和有效性",
+        "examineBrief": "本任务为确保合同中引用的法律文件名称的准确性和有效性，合同中未引用任何法律文件。因此，合同文本在此方面不存在缺陷或风险，无需进行修改。",
+        "riskLevel": "normal",
+        "subRisks": [
+          {
+            "resultType": "通过"
+          }
+        ],
+        "ruleSequence": "1.2"
+      },
+      "resultTaskId": "c30f53be-8892-4aa0-b39d-29d9af139ba9"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "C885DBCC-AB03-5866-9E7E-896C27107A07",
+    "Output": {
+      "result": {
+        "examineResult": "需要修改",
+        "ruleTag": "简要审查合同主体及合法性",
+        "ruleTitle": "审查合同主体资格",
+        "examineBrief": "本任务为审查合同主体资格。合同文本中未提及合同主体资格审查的具体条款，存在缺陷或风险，应当进行修正，以避免潜在的法律风险。",
+        "riskLevel": "medium",
+        "subRisks": [
+          {
+            "riskClause": "合同主体条款",
+            "riskBrief": "未明确规定合同主体资格",
+            "riskExplain": "合同文本中未明确规定合同主体资格，可能导致合同无效或履行困难，进而引发法律纠纷。",
+            "resultType": "需增加",
+            "originalContent": "鉴于双方自愿达成如下协议：\n\n",
+            "resultContent": "1. 合同主体资格\n\n1.1 自然人主体：本合同的自然人主体应具备完全民事行为能力。如不具备完全民事行为能力，应经过其法定监护人的书面同意。\n\n1.2 法人或其他组织主体：本合同的法人或其他组织主体应依法成立并有效存续，具有签订和履行本合同的合法资格。如签订合同的主体为法人的分支机构，需提供法人授权书。\n\n1.3 特别规定：根据《民法典》第六百八十三条的规定，下列三类主体不能作为保证人：机关法人、以公益为目的的非营利法人、非法人组织。如果合同主体不是保证人则无此限制。\n\n1.4 双方应在签署本合同时提供必要的证明文件，以证明其具备签订和履行本合同的合法资格。"
+          }
+        ],
+        "ruleSequence": "1.3"
+      },
+      "resultTaskId": "c30f53be-8892-4aa0-b39d-29d9af139ba9"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "C885DBCC-AB03-5866-9E7E-896C27107A07",
+    "Output": {
+      "result": {
+        "examineResult": "需要修改",
+        "ruleTag": "简要审查合同的主要条款",
+        "ruleTitle": "在合同标的条款中，审查标的的合法性、标的名称和数量的明确性和规范性，以及标的的特定性",
+        "examineBrief": "本任务为审查标的的合法性、名称和数量的明确性和规范性，以及标的的特定性。合同文本中未提及标的物的具体信息，包括名称、数量、特性等，因此，应当做如下修正，以避免潜在的法律风险。",
+        "riskLevel": "high",
+        "subRisks": [
+          {
+            "riskClause": "标的条款",
+            "riskBrief": "标的物描述不明确",
+            "riskExplain": "由于标的物描述不明确，可能导致双方在实际操作中对标的物有不同解读，进而引发争议。",
+            "resultType": "需增加",
+            "originalContent": "1. Purpose of the Agreement\n\nThis agreement sets forth the terms and conditions under which the parties agree to conduct their business relationship. ",
+            "resultContent": "2. Description of Goods\n\n2.1 Name of Goods: The specific name of the goods shall be clearly stated, using the formal product name without abbreviation or slang. For example, if the goods are laptops, the full model name such as 'Brand X Model Y' should be used.\n\n2.2 Quantity: The exact quantity of the goods shall be specified using standardized units of measurement. For instance, if the goods are measured in units, the quantity should be stated as '100 units'.\n\n2.3 Characteristics: Any specific characteristics of the goods, such as color, size, specifications, or any other distinguishing features, shall be detailed. For example, 'Brand X Model Y, black color, 15-inch screen, 256GB SSD'.\n\n2.4 Attachment: If the types or quantities of goods are numerous, an attachment list can be provided as an appendix to this contract."
+          }
+        ],
+        "ruleSequence": "2.1"
+      },
+      "resultTaskId": "c30f53be-8892-4aa0-b39d-29d9af139ba9"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "C885DBCC-AB03-5866-9E7E-896C27107A07",
+    "Output": {
+      "result": {
+        "examineResult": "需要修改",
+        "ruleTag": "简要审查合同的主要条款",
+        "ruleTitle": "在合同违约责任条款中，根据双方的合同义务确定违约责任",
+        "examineBrief": "本任务为审查违约责任条款，确保其全面性和合理性。合同中未提及违约责任条款，这可能导致合同在执行过程中缺乏对违约行为的有效约束机制，进而引发纠纷。因此，应当做如下修正，以避免潜在的法律风险。",
+        "riskLevel": "high",
+        "subRisks": [
+          {
+            "riskClause": "违约责任条款",
+            "riskBrief": "合同中未提及违约责任条款",
+            "riskExplain": "由于合同中未提及违约责任条款，可能导致合同在执行过程中缺乏对违约行为的有效约束机制，进而引发纠纷。",
+            "resultType": "需增加",
+            "originalContent": "双方同意按照本合同的规定履行各自的义务。",
+            "resultContent": "8. 违约责任条款\n\n8.1 卖方违约责任\n8.1.1 如果卖方未按照合同约定的时间交付货物，每逾期一天，卖方应按照总货款的0.5%支付违约金，逾期超过30天的，买方有权解除合同并要求卖方支付违约金。\n8.1.2 如果卖方交付的货物不符合合同约定的质量标准，卖方应承担违约责任，买方有权要求更换、退货或折价处理，并有权要求卖方支付违约金。\n8.1.3 如果卖方未能按照合同约定提供售后服务，买方有权向第三方购买同类服务，因此支出的费用有权向卖方追索（或从质保金中予以扣除）。\n\n8.2 买方违约责任\n8.2.1 如果买方未及时受领货物，每逾期一天，买方应按照总货款的0.5%支付违约金，并承担卖方因此支出的仓储费、运输费及相关费用。\n8.2.2 如果买方未及时验收，视为货物符合合同约定。\n8.2.3 如果买方未按照合同约定的时间和数额支付货款，每逾期一天，买方应按照其所拖欠货款的0.5%支付违约金，逾期超过30天的，卖方有权解除合同并要求买方支付违约金。\n\n8.3 其他违约责任\n8.3.1 如果任何一方违反本合同的其他条款，应承担相应的违约责任，并赔偿对方因此遭受的全部损失。"
+          }
+        ],
+        "ruleSequence": "2.2"
+      },
+      "resultTaskId": "c30f53be-8892-4aa0-b39d-29d9af139ba9"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "C885DBCC-AB03-5866-9E7E-896C27107A07",
+    "Output": {
+      "result": {
+        "examineResult": "需要修改",
+        "ruleTag": "简要审查合同的主要条款",
+        "ruleTitle": "在合同争议解决条款中，争议解决的约定是否完备、合理",
+        "examineBrief": "本任务为审查合同中争议解决条款的完备性和合理性。合同中未提及争议解决条款，存在缺陷或风险，应当进行修正，以避免潜在的法律风险。因此，应当做如下修正，以避免潜在的法律风险。",
+        "riskLevel": "medium",
+        "subRisks": [
+          {
+            "riskClause": "争议解决条款",
+            "riskBrief": "争议解决条款缺失",
+            "riskExplain": "合同中未包含争议解决条款，可能导致未来争议无法得到有效解决，增加法律风险。",
+            "resultType": "需增加",
+            "originalContent": "双方同意遵守本合同的所有条款和条件。",
+            "resultContent": "8. 争议解决\n\n8.1 争议解决方式：双方同意，如因本合同引起的或与本合同有关的任何争议，应首先通过友好协商解决。协商不成的，双方可以选择以下一种方式解决争议：\n\n(a) 提起诉讼：双方同意将争议提交至被告所在地或合同履行地的人民法院管辖。\n(b) 仲裁：双方同意将争议提交至中国国际经济贸易仲裁委员会（CIETAC）进行仲裁，仲裁地点为北京。仲裁裁决是终局的，对双方均有约束力。\n\n8.2 特殊条款：如本合同涉及不动产买卖，双方同意将争议提交至不动产所在地的人民法院管辖。\n\n8.3 法律适用：本合同的订立、效力、解释、履行及争议解决均适用中华人民共和国法律。"
+          }
+        ],
+        "ruleSequence": "2.3"
+      },
+      "resultTaskId": "c30f53be-8892-4aa0-b39d-29d9af139ba9"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "C885DBCC-AB03-5866-9E7E-896C27107A07",
+    "Output": {
+      "result": {
+        "examineResult": "需要修改",
+        "ruleTag": "简要审查合同主体及合法性",
+        "ruleTitle": "在合同主体条款中，主体信息是否完整、准确， 是否具备主体资格",
+        "examineBrief": "本任务为审查合同主体条款中主体信息是否完整、准确，是否具备主体资格，合同中未提及合同主体的相关信息。因此，合同文本存在缺陷或风险，应当进行修正，以避免潜在的法律风险。",
+        "riskLevel": "medium",
+        "subRisks": [
+          {
+            "riskClause": "合同主体条款",
+            "riskBrief": "合同主体信息不完整、不准确",
+            "riskExplain": "由于合同主体信息不完整、不准确，可能导致合同无效或无法执行，进而引发法律纠纷。",
+            "resultType": "需增加",
+            "originalContent": "This Agreement is made and entered into by and between the Parties as follows: ",
+            "resultContent": "1. Contracting Parties\n\n1.1 Party A (the Service Provider)\nName: [Full Name]\nGender: [Male/Female]\nResidence Address: [Address]\nID Number: [ID Number]\nContact Information: [Phone Number, Email]\nDate of Birth: [Date]\nEmployer and Position: [Employer, Position]\nBank Account: [Account Number]\nBank Name: [Bank Name]\nUnified Social Credit Code: [Code]\n\n1.2 Party B (the Client)\nName: [Full Name]\nGender: [Male/Female]\nResidence Address: [Address]\nID Number: [ID Number]\nContact Information: [Phone Number, Email]\nDate of Birth: [Date]\nEmployer and Position: [Employer, Position]\nBank Account: [Account Number]\nBank Name: [Bank Name]\nUnified Social Credit Code: [Code]"
+          },
+          {
+            "riskClause": "合同主体条款",
+            "riskBrief": "未确认主体资格",
+            "riskExplain": "由于未确认主体资格，可能导致合同无效或无法执行，进而引发法律纠纷。",
+            "resultType": "需增加",
+            "originalContent": "1.2 Party B (the Client)\nUnified Social Credit Code: [Code] ",
+            "resultContent": "\n\n1.3 Confirmation of Legal Capacity\n\n1.3.1 For Natural Persons: Both parties confirm that they have full civil capacity and are capable of entering into and performing this contract. If either party is a minor or otherwise lacks full civil capacity, this contract must be signed by their legal guardian or representative.\n\n1.3.2 For Legal Entities or Other Organizations: Both parties confirm that they are legally established and validly existing entities. If either party is a branch of a legal entity, it must have obtained authorization from the legal entity to enter into this contract. Functions or departments of a legal entity do not have the authority to sign contracts."
+          }
+        ],
+        "ruleSequence": "1.1"
+      },
+      "resultTaskId": "c30f53be-8892-4aa0-b39d-29d9af139ba9"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 1,
+      "unit": "page"
+    },
+    "RequestId": "C885DBCC-AB03-5866-9E7E-896C27107A07",
+    "Output": {
+      "result": {},
+      "resultTaskId": "c30f53be-8892-4aa0-b39d-29d9af139ba9"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  }
+]

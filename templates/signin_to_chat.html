@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LVXIN - Sign In</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --card-bg: #18181b;
+      --input-bg: #232329;
+      --input-border: #3f3f46;
+      --input-focus: #6366f1;
+      --text-main: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --divider: #27272a;
+      --google-bg: #fff;
+      --google-text: #222;
+      --google-border: #e5e7eb;
+      --link: #818cf8;
+      --link-hover: #a5b4fc;
+      --error: #f87171;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #09090b;
+      min-height: 100vh;
+      height: 100vh;
+      width: 100vw;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      color: var(--text-main);
+      overflow: hidden;
+    }
+    .split-container {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+    }
+    .left-half, .right-half {
+      flex: 1 1 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
+    .left-half {
+      background: #09090b;
+    }
+    .right-half {
+      background: linear-gradient(135deg,rgb(0, 0, 0) 0%, #4f46e5 100%);
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .login-container {
+      background: var(--card-bg);
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.45);
+      padding: 40px 32px 32px 32px;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+    .logo {
+      margin-bottom: 8px;
+    }
+    .logo img {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.12);
+      object-fit: cover;
+    }
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+      color: var(--text-main);
+    }
+    .social-login {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+    .social-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 0;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: 1.5px solid var(--google-border);
+      background: var(--google-bg);
+      color: var(--google-text);
+      cursor: pointer;
+      transition: box-shadow 0.2s, border 0.2s;
+      margin-bottom: 6px;
+    }
+    .social-btn i {
+      font-size: 1.2em;
+    }
+    .social-btn:hover {
+      box-shadow: 0 2px 8px rgba(99,102,241,0.10);
+      border: 1.5px solid var(--primary);
+    }
+    .social-btn.wechat {
+      background: #1aad19;
+      color: #fff;
+      border: none;
+    }
+    .separator {
+      width: 100%;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin: 12px 0 8px 0;
+      position: relative;
+    }
+    .separator:before, .separator:after {
+      content: "";
+      display: inline-block;
+      width: 40%;
+      height: 1px;
+      background: var(--divider);
+      vertical-align: middle;
+      margin: 0 8px;
+    }
+    form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 0.98rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .form-group input {
+      background: var(--input-bg);
+      border: 1.5px solid var(--input-border);
+      color: var(--text-main);
+      border-radius: 7px;
+      padding: 12px;
+      font-size: 1rem;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border: 1.5px solid var(--input-focus);
+      box-shadow: 0 0 0 2px #6366f133;
+    }
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      border: none;
+      padding: 13px 0;
+      font-size: 1.08rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.10);
+    }
+    .submit-btn:hover {
+      background: linear-gradient(90deg, var(--primary-dark), var(--primary));
+      box-shadow: 0 4px 16px rgba(99,102,241,0.18);
+    }
+    .links {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 0.97rem;
+    }
+    .links a {
+      color: var(--link);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .links a:hover {
+      color: var(--link-hover);
+      text-decoration: underline;
+    }
+    .error-message {
+      color: var(--error);
+      font-size: 1rem;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    /* Right half image styling */
+    .side-image {
+      max-width: 95%;
+      max-height: 95%;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.18);
+      object-fit: cover;
+      background: #fff;
+      display: block;
+      margin: 0 auto;
+    }
+    /* Responsive: stack on mobile */
+    @media (max-width: 900px) {
+      .split-container {
+        flex-direction: column;
+      }
+      .left-half, .right-half {
+        width: 100vw;
+        min-height: 50vh;
+        height: auto;
+      }
+      .right-half {
+        padding: 24px 0;
+      }
+    }
+    @media (max-width: 500px) {
+      .login-container {
+        padding: 24px 8px 18px 8px;
+        max-width: 98vw;
+      }
+      .logo img {
+        width: 44px;
+        height: 44px;
+      }
+      .side-image {
+        max-width: 95vw;
+        max-height: 40vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="split-container">
+    <div class="left-half">
+      <div class="login-container">
+        <div class="logo">
+          <img src="../static/images/logo.jpg" alt="LVXIN Logo">
+        </div>
+        <h1>Sign in to LVXIN</h1>
+        <div class="social-login">
+          <button class="social-btn" onclick="googleLogin()">
+            <i class="fab fa-google"></i> Continue with Google
+          </button>
+          <button class="social-btn wechat" onclick="wechatLogin()">
+            <i class="fab fa-weixin"></i> Continue with WeChat
+          </button>
+        </div>
+        <div class="separator">or</div>
+        
+        <form action="signin_to_chat" method="POST">
+          {% if error_message %}
+          <div class="error-message">
+            {{ error_message }}
+          </div>
+          {% endif %}
+          <div class="form-group">
+            <label for="email">Email or Username</label>
+            <input type="text" id="email" name="email" placeholder="Enter your email or username" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+          </div>
+          <button type="submit" class="submit-btn">Sign In</button>
+        </form>
+        <div class="links">
+          <a href="forgetpassword.html">Forgot password?</a>
+          <a href="signup">Sign up</a>
+        </div>
+      </div>
+    </div>
+    <div class="right-half">
+      <!-- Replace the src below with your preferred image -->
+      <img class="side-image" src="../static/images/signin.png" alt="Welcome to LVXIN">
+      
+    </div>
+    
+  </div>
+  <script>
+    function wechatLogin() {
+      window.location.href = "https://open.weixin.qq.com/connect/qrconnect?appid=YOUR_APP_ID&redirect_uri=YOUR_REDIRECT_URL&response_type=code&scope=snsapi_login#wechat_redirect";
+    }
+    function googleLogin() {
+      window.location.href = "https://accounts.google.com/o/oauth2/v2/auth?client_id=YOUR_GOOGLE_CLIENT_ID&redirect_uri=YOUR_REDIRECT_URI&response_type=code&scope=email%20profile";
+    }
+  </script>
+</body>
+</html>
