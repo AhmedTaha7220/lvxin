@@ -546,47 +546,33 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <!-- 导航栏 -->
+    <nav class="navbar">
         <div class="logo">
-            <a href="welcome_page" aria-label="Lvxin Legal Technology Home">
-                <img src="../static/images/logo.jpg" alt="绿信标志" loading="lazy">
+            <a href="welcome_page">
+                <img src="../static/images/logo.jpg" alt="绿信标志">
             </a>
-        </div>
-        <div class="nav-links">
-            <a href="subscriptions" class="en-content" data-zh="定价">Pricing</a>
-            <a href="aboutus" class="en-content" data-zh="关于我们">About Us</a>
-            <a href="helpcenter" class="en-content" data-zh="帮助中心">Help Center</a>
         </div>
         <div class="actions">
-            <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">
+            <button id="themeToggle" class="icon-btn">
                 <i class="fas fa-moon"></i>
             </button>
-            <button id="languageToggle" class="icon-btn" aria-label="Toggle language">
-                <i class="fas fa-globe"></i>
-            </button>
+            <!-- Elfsight 网站翻译器 | 无标题网站翻译器 -->
             <script src="https://static.elfsight.com/platform/platform.js" async></script>
-            
-           
             <div class="elfsight-app-fce75b10-069c-41d5-bca0-09c33e812801" data-elfsight-app-lazy></div>
-            <a href="profile" class="profile-component" aria-label="User profile">
-                <img src="../static/images/profile.jpg" class="profile-image" alt="个人资料图片" loading="lazy">
+
+            <a href="profile" class="profile-component">
+                <img src="../static/images/profile.jpeg" class="profile-image" alt="个人资料图片">
                 <span class="profile-name">{{name}}</span>
             </a>
-            
         </div>
     </nav>
 
-    <!-- Sidebar Toggle Button (Mobile) -->
-    <button id="sidebarToggle" class="icon-btn" aria-label="Toggle sidebar">
-        <i class="fas fa-bars"></i>
-    </button>
-
-<!-- 侧边栏 -->
-<nav class="sidebar">
-    <div class="nav-section">
-        <div class="nav-title">团队数据库</div>
-        <a href="mydash" class="nav-item"> <i class="fas fa-bar-chart"></i> 上传合同 </a>
+    <!-- 侧边栏 -->
+    <nav class="sidebar">
+        <div class="nav-section">
+            <div class="nav-title">合同</div>
+        <a href="mydash" class="nav-item"> <i class="fas fa-bar-chart"></i> 仪表板 </a>
         <a href="upload_contract" class="nav-item"> <i class="fas fa-file-upload"></i> 上传合同 </a>
         <a href="history" class="nav-item"> <i class="fas fa-history"></i> 分析历史 </a>
         <a href="analysis" class="nav-item"> <i class="fas fa-folder-open"></i> 文档分析 </a>

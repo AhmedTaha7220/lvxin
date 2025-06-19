@@ -765,56 +765,49 @@
             }
         }
     </style>
-</head>
-<body>
-    <!-- Header -->
-    <nav class="navbar">
-        <div class="logo">
-            <a href="welcome_page">
-                <img src="../static/images/logo.jpg" alt="Company Logo">
-            </a>
-        </div>
-
-        <div class="nav-links">
-            <a href="subscriptions" class="en-content">Pricing</a>
-            <a href="aboutus" class="en-content">About Us</a>
-            <a href="helpcenter" class="en-content">Help Center</a>
-        </div>
-        <div class="actions">
-            <button id="themeToggle" class="icon-btn">
-                <i class="fas fa-moon"></i>
-            </button>
-            <!-- Elfsight website translator -->
-            <script src="https://static.elfsight.com/platform/platform.js" async></script>
-            <div class="elfsight-app-fce75b10-069c-41d5-bca0-09c33e812801" data-elfsight-app-lazy></div>
-
-            <a href="profile" class="profile-component">
-                <img src="../static/images/profile.jpeg" class="profile-image" alt="Profile Image">
-                <span class="profile-name">{{name}}</span>
-            </a>
-        </div>
-    </nav>
-
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="nav-section">
-            <h3 class="nav-title">Team Database</h3>
-            <a href="mydash" class="nav-item"> <i class="fas fa-bar-chart"></i> 上传合同 </a>
-            <a href="upload_contract" class="nav-item"><i class="fas fa-file-upload"></i> Upload Contract</a>
-            <a href="history" class="nav-item"><i class="fas fa-history"></i> Analysis History</a>
-            <a href="Analytics_Dashboard" class="nav-item active"><i class="fas fa-file-contract"></i> Document Analysis</a>
+    <body>
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="logo">
+                <a href="welcome_page">
+                    <img src="../static/images/logo.jpg" alt="绿信标志">
+                </a>
+            </div>
+            <div class="actions">
+                <button id="themeToggle" class="icon-btn">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <!-- Elfsight 网站翻译器 | 无标题网站翻译器 -->
+                <script src="https://static.elfsight.com/platform/platform.js" async></script>
+                <div class="elfsight-app-fce75b10-069c-41d5-bca0-09c33e812801" data-elfsight-app-lazy></div>
+    
+                <a href="profile" class="profile-component">
+                    <img src="../static/images/profile.jpeg" class="profile-image" alt="个人资料图片">
+                    <span class="profile-name">{{name}}</span>
+                </a>
+            </div>
+        </nav>
+    
+        <!-- 侧边栏 -->
+        <nav class="sidebar">
+            <div class="nav-section">
+                <div class="nav-title">合同</div>
+            <a href="mydash" class="nav-item"> <i class="fas fa-bar-chart"></i> 仪表板 </a>
+            <a href="upload_contract" class="nav-item"> <i class="fas fa-file-upload"></i> 上传合同 </a>
+            <a href="history" class="nav-item"> <i class="fas fa-history"></i> 分析历史 </a>
+            <a href="analysis" class="nav-item active"> <i class="fas fa-folder-open"></i> 文档分析 </a>
         </div>
         <div class="nav-section">
-            <h3 class="nav-title">Account</h3>
-            <a href="profile" class="nav-item"><i class="fas fa-user"></i> User Profile</a>
-            <a href="subscriptions" class="nav-item"><i class="fas fa-star"></i> Subscriptions</a>
+            <div class="nav-title">账户</div>
+            <a href="profile" class="nav-item"> <i class="fas fa-user"></i> 用户资料 </a>
+            <a href="subscriptions" class="nav-item"> <i class="fas fa-star"></i> 订阅 </a>
         </div>
         <div class="nav-section">
-            <h3 class="nav-title">Support</h3>
-            <a href="contactus" class="nav-item"><i class="fas fa-envelope"></i> Contact Us</a>
-            <a href="helpcenter" class="nav-item"><i class="fas fa-question-circle"></i> FAQs</a>
-            <a href="aboutus" class="nav-item"><i class="fas fa-info-circle"></i> About Us</a>
-            <a href="whats-new" class="nav-item"><i class="fas fa-info-circle"></i> What's New</a>
+            <div class="nav-title">支持</div>
+            <a href="contactus" class="nav-item"> <i class="fas fa-envelope"></i> 联系我们 </a>
+            <a href="helpcenter" class="nav-item"> <i class="fas fa-question-circle"></i> 常见问题 </a>
+            <a href="aboutus" class="nav-item"> <i class="fas fa-info-circle"></i> 关于我们 </a>
+            <a href="whats-new" class="nav-item "><i class="fas fa-info-circle"></i>有什么新的</a>
         </div>
     </nav>
 

@@ -27,6 +27,7 @@ print(os.getenv("work_id"))
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 #####################################################################
 # Uploading files from local
 #####################################################################
@@ -474,6 +475,8 @@ def convert_to_clean_json(json_content, output_filename, limit_rows=None):
     except Exception as e:
         print(f"Error: {e}")
         return None, f"Error: {e}"
+    
+    
 #####################################################################
 # Starting our main app
 #####################################################################
@@ -660,9 +663,19 @@ async def handle_form(
         """, (email, password))
 
         user = cur.fetchone()
+
+        cur.execute("""
+            SELECT * FROM companies 
+            WHERE email = %s AND password = %s
+        """, (email, password))
+
+        company = cur.fetchone()
+
         # user = (user_id, password, email, phone, age, language, country, subscription, full_name, files_names, username)
         logger.info(f"The data returned from the database is: {user}")
-        if not user:
+        logger.info(f"The data returned from the database is: {company}")
+
+        if not user and not company:
             logger.info("Wrong Wrongggg")
             return ht_pages.TemplateResponse(
             "signin_to_chat.html", 
@@ -671,7 +684,31 @@ async def handle_form(
                 "error_message": "Wrong email or password",
             }
         )
-        username = user[10]
+        if user:
+            username = user[6]
+            user_json = get_user_by_credentials(username, password)
+            logger.info(f"the data extracted from the json is {user_json}")
+            
+            logger.info("The data stored in the database is: %s", user)
+            # Update last login time
+            update_user_login_time(user[0], user[10]) # user id and username
+            # Create a new session
+            session_id = uuid4()
+            session_data = SessionData(
+                user_id=user[0],
+                username=user[10],
+                email=user[2]
+            )
+            
+            await backend.create(session_id, session_data)
+            # Redirect to dashboard with session cookie
+            response = RedirectResponse(url="/chat", status_code=status.HTTP_303_SEE_OTHER)
+            
+            response.set_cookie(key="user_id", value=user[0])
+            cookie.attach_to_response(response, session_id)
+            return response
+        elif company:
+            username = company[8]
         # Query to fetch full_name using email
         user_json = get_user_by_credentials(username, password)
         logger.info(f"the data extracted from the json is {user_json}")
@@ -801,16 +838,97 @@ async def handle_form(
         #if 'conn' in locals(): cur.putconn(conn)
 
 
-@app.post("/signup")
+@app.post("/signup/company")
+async def receive_form_comp(
+    request: Request,
+    fullname_company: str = Form(...),
+    email_company: str = Form(...),
+    license_company: str = Form(...),
+    phone_company: str = Form(...),
+    password: str = Form (...)
+):
+    username = fullname_company.replace(" ", "_")
+    # First, check if email or phone already exists in the database
+    logger.info(f"the passed parameters are {email_company} and {phone_company} and {username}")
+
+    cur.execute("SELECT email FROM companies WHERE email = %s", (email_company,))
+    existing_user = cur.fetchone()
+    if existing_user:
+            logger.info(f"Duplicated email the email that you sent is {email_company} and {existing_user}")
+            return ht_pages.TemplateResponse(
+                "signup.html", 
+                {
+                    "request": request, 
+                    "error_message": "Your Email,is duplicated please try a new one",
+                    # Optional: Return the form data to pre-fill the form except for the problematic fields
+                    "fullname": fullname_company
+                }
+            )
+    cur.execute("SELECT full_name FROM companies WHERE username = %s", (username,))
+    existing_user = cur.fetchone()
+    if existing_user:
+            logger.info(f"Duplicated fullname the fullname that you sent is {fullname_company} and {existing_user}")
+            return ht_pages.TemplateResponse(
+                "signup.html", 
+                {
+                    "request": request, 
+                    "error_message": "Your username, is duplicated please try a new one",
+                    # Optional: Return the form data to pre-fill the form except for the problematic fields
+                    "fullname": fullname_company
+                }
+            )
+    
+    cur.execute("SELECT full_name FROM companies WHERE phone = %s", (phone_company,))
+    existing_user = cur.fetchone()
+    if existing_user and existing_user[0] != "":
+            logger.info(f"Duplicated phone the phone that you sent is {phone_company} and {existing_user}")
+            return ht_pages.TemplateResponse(
+                "signup.html", 
+                {
+                    "request": request, 
+                    "error_message": "Your phone,is duplicated please try a new one",
+                    # Optional: Return the form data to pre-fill the form except for the problematic fields
+                    "fullname": fullname_company
+                }
+            )
+    logger.info("We passed the check")
+    company_id = str(uuid4())
+    # Convert age to integer if needed
+
+    logger.info("THE ERROR IS IN HERE")
+    # Insert new user data
+    cur.execute("""
+                INSERT INTO companies (comp_id, password, email, phone, full_name, files_names, last_login, subscription, username, license)
+                VALUES (%s,%s, %s, %s, %s, ARRAY['EMPTY'], %s, %s, %s, %s)
+                """, (company_id,password, email_company, phone_company, fullname_company, datetime.now(), None, username, license_company))
+
+    logger.info("Data added successfully")
+    con.commit()
+    # Create user folder and save data
+    save_user_data(company_id, username, fullname_company, email_company)
+    # Get the temp file ID from cookie
+    temp_file_id = request.cookies.get("temp_file_id")
+    temp_file_name = request.cookies.get("temp_file_name")
+    temp_file_ext = request.cookies.get("temp_file_ext")
+    if temp_file_id and temp_file_ext:
+        # Store file ID in the session
+        response = RedirectResponse(url="/signin_to_load", status_code=status.HTTP_303_SEE_OTHER)
+        response.set_cookie(key="temp_file_id", value=temp_file_id)
+        response.set_cookie(key="temp_file_name", value=temp_file_name)
+        response.set_cookie(key="temp_file_ext", value=temp_file_ext)
+        logger.info("We reached the end of the analyze")
+        return response
+
+    # Redirect to signin page
+    return RedirectResponse(url="/signin_to_upload", status_code=303)
+
+@app.post("/signup/user")
 async def receive_form(
     request: Request,
     fullname: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
-    age: str = Form(...),
     phone: str = Form(...),
-    language: str = Form(...),
-    country: str = Form(...),
     username: str = Form(...)
 ):
     # First, check if email or phone already exists in the database
@@ -825,10 +943,7 @@ async def receive_form(
                     "request": request, 
                     "error_message": "Your Email,is duplicated please try a new one",
                     # Optional: Return the form data to pre-fill the form except for the problematic fields
-                    "fullname": fullname,
-                    "age": age,
-                    "language": language,
-                    "country": country
+                    "fullname": fullname
                 }
             )
     cur.execute("SELECT username FROM users WHERE username = %s", (username,))
@@ -839,12 +954,9 @@ async def receive_form(
                 "signup.html", 
                 {
                     "request": request, 
-                    "error_message": "Your username,is duplicated please try a new one",
+                    "error_message": "Your username, is duplicated please try a new one",
                     # Optional: Return the form data to pre-fill the form except for the problematic fields
-                    "fullname": fullname,
-                    "age": age,
-                    "language": language,
-                    "country": country
+                    "fullname": fullname
                 }
             )
     cur.execute("SELECT phone FROM users WHERE phone = %s", (phone,))
@@ -857,25 +969,19 @@ async def receive_form(
                     "request": request, 
                     "error_message": "Your phone,is duplicated please try a new one",
                     # Optional: Return the form data to pre-fill the form except for the problematic fields
-                    "fullname": fullname,
-                    "age": age,
-                    "language": language,
-                    "country": country
+                    "fullname": fullname
                 }
             )
     logger.info("We passed the check")
     user_id = str(uuid4())
     # Convert age to integer if needed
-    try:
-        age_int = int(age)
-    except ValueError:
-        age_int = 0  # Default value or handle the error as appropriate
+
 
     # Insert new user data
     cur.execute("""
-                INSERT INTO users (user_id, full_name, email, password, age, phone, language, country, files_names, username)
-                VALUES (%s,%s, %s, %s, %s, %s, %s, %s, ARRAY['EMPTY'], %s)
-                """, (user_id,fullname, email, password, age_int, phone, language, country,username))
+                INSERT INTO users (user_id, password, email, phone, full_name,files_names, username, last_login, subscription)
+                VALUES (%s,%s, %s, %s, %s, ARRAY['EMPTY'], %s, %s, %s)
+                """, (user_id,password, email, phone, fullname, username, datetime.now(), None))
 
     logger.info("Data added successfully")
     con.commit()
@@ -1738,7 +1844,7 @@ def format_markdown(text):
 
 def extract_and_print_markdown(data):
     results = []
-    last_two_items = data[-1:]
+    last_two_items = data[-2:]
     for index, item in enumerate(last_two_items, start=len(data)-1):
         markdown = item.get("ResponseMarkdown", "")
         if markdown:  # Only process non-empty markdown
@@ -1750,8 +1856,11 @@ class ChatRequest(BaseModel):
     message: str
 @app.post("/chat")
 async def chat_endpoint(chat: ChatRequest):
-    messages = [{"role": "user", "content": chat.message},]
+    messages = [{"role": "user", "content": f"彻底分析以下法律问题。一般分析：首先从合法性、谈判原则及[插入国家名称或管辖区]相关法律和司法实践的角度审视该问题。法律依据：列出您在分析中所依赖的所有法律、法规和条款，包括任何相关的国际协议。详细解决方案：提供详细、准确且经过良好构建的解决方案，清晰地逐步分解每一个步骤或论点。风险和警告：识别这种情况下可能出现的任何风险、漏洞或法律后果。总结：以清晰简洁的总结或结论结束您的发现和建议。: {chat.message}"},]
     raw_out = generate_message(messages)
+    with open('Chat_user_output.json', 'w', encoding='utf-8') as f:
+        json.dump(raw_out, f, ensure_ascii=False, indent=4)
+    
     response = extract_and_print_markdown(raw_out)
     return {"response": response}
 

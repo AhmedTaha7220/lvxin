@@ -85,15 +85,22 @@ def generate_message(messages):
     if response.status_code != 200:
         print(f"HTTP Error: {response.status_code}\nResponse: {response.text}")
         return
-    result = []
+    results = []
     for line in response.iter_lines():
         if line:
             decoded_line = line.decode('utf-8')
             if decoded_line.startswith('data:'):
                 json_data = decoded_line[5:]
-                result.append(json.loads(json_data))
-                #on_message(json.loads(json_data))
+                data = json.loads(json_data)
+                results.append(data)
 
-    return result
+    return results
+
+    
 
 # 示例用法
+messages = [
+    {"role": "user", "content": "我的车被撞了，给我推荐10个相似案例，请把案例标题、案号以及网上的案例地址也发出来？"}
+]
+
+

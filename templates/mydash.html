@@ -71,35 +71,33 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
+    <!-- 导航栏 -->
     <nav class="navbar">
         <div class="logo">
             <a href="welcome_page">
                 <img src="../static/images/logo.jpg" alt="绿信标志">
             </a>
         </div>
-        <div class="nav-links">
-            <a href="subscriptions" class="en-content">定价</a>
-            <a href="aboutus" class="en-content">关于我们</a>
-            <a href="helpcenter" class="en-content">帮助中心</a>
-        </div>
         <div class="actions">
             <button id="themeToggle" class="icon-btn">
                 <i class="fas fa-moon"></i>
             </button>
+            <!-- Elfsight 网站翻译器 | 无标题网站翻译器 -->
             <script src="https://static.elfsight.com/platform/platform.js" async></script>
             <div class="elfsight-app-fce75b10-069c-41d5-bca0-09c33e812801" data-elfsight-app-lazy></div>
+
             <a href="profile" class="profile-component">
                 <img src="../static/images/profile.jpeg" class="profile-image" alt="个人资料图片">
                 <span class="profile-name">{{name}}</span>
             </a>
         </div>
     </nav>
-    <!-- Sidebar -->
+
+    <!-- 侧边栏 -->
     <nav class="sidebar">
         <div class="nav-section">
-            <div class="nav-title">团队数据库</div>
-            <a href="mydash" class="nav-item active" > <i class="fas fa-bar-chart"></i> 上传合同 </a>
+            <div class="nav-title">合同</div>
+            <a href="mydash" class="nav-item active" > <i class="fas fa-bar-chart"></i> 仪表板 </a>
             <a href="upload_contract" class="nav-item"> <i class="fas fa-file-upload"></i> 上传合同 </a>
             <a href="history" class="nav-item"> <i class="fas fa-history"></i> 分析历史 </a>
             <a href="analysis" class="nav-item"> <i class="fas fa-folder-open"></i> 文档分析 </a>

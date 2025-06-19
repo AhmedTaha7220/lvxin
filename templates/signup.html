@@ -21,14 +21,14 @@
                 --google-bg: #4285F4;
                 /* Google blue */
             }
-            
+
             * {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
                 font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
             }
-            
+
             body {
                 background: var(--body-bg);
                 display: flex;
@@ -37,7 +37,7 @@
                 flex-direction: column;
                 min-height: 100vh;
             }
-            
+
             .login-container {
                 background: var(--card-bg);
                 padding: 40px;
@@ -48,11 +48,11 @@
                 text-align: center;
                 transition: transform 0.3s ease;
             }
-            
+
             .login-container:hover {
                 transform: translateY(-5px);
             }
-            
+
             h1 {
                 font-size: 24px;
                 margin-bottom: 20px;
@@ -62,12 +62,12 @@
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
             }
-            
+
             .logo {
                 position: relative;
                 margin-bottom: 30px;
             }
-            
+
             .logo img {
                 width: 100px;
                 transition: all 0.7s ease;
@@ -76,16 +76,16 @@
                 background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
                 padding: 5px;
             }
-            
+
             .logo:hover img {
                 transform: scale(1.1) rotate(5deg);
                 filter: drop-shadow(0 6px 12px rgba(74, 144, 226, 0.5));
             }
-            
+
             .social-login {
                 margin: 20px 0;
             }
-            
+
             .social-btn {
                 display: flex;
                 align-items: center;
@@ -102,25 +102,25 @@
                 border: none;
                 color: white;
             }
-            
+
             .social-btn i {
                 margin-right: 12px;
                 font-size: 20px;
             }
-            
+
             .social-btn.wechat {
                 background: linear-gradient(135deg, var(--success), #09b83e);
             }
-            
+
             .social-btn.google {
                 background: linear-gradient(135deg, var(--google-bg), #66a3ff);
             }
-            
+
             .social-btn:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 4px 8px rgba(108, 92, 231, 0.3);
             }
-            
+
             .separator {
                 margin: 30px 0;
                 text-align: center;
@@ -128,7 +128,7 @@
                 font-weight: bold;
                 position: relative;
             }
-            
+
             .separator::before,
             .separator::after {
                 content: "";
@@ -138,28 +138,28 @@
                 height: 1px;
                 background: linear-gradient(to right, transparent, var(--primary));
             }
-            
+
             .separator::before {
                 left: 0;
             }
-            
+
             .separator::after {
                 right: 0;
                 background: linear-gradient(to left, transparent, var(--primary));
             }
-            
+
             .form-group {
                 margin-bottom: 20px;
                 text-align: left;
             }
-            
+
             .form-group label {
                 display: block;
                 font-weight: bold;
                 margin-bottom: 8px;
                 color: var(--text-primary);
             }
-            
+
             .form-group input {
                 width: 100%;
                 padding: 12px;
@@ -168,13 +168,13 @@
                 font-size: 16px;
                 transition: all 0.3s ease;
             }
-            
+
             .form-group input:focus {
                 outline: none;
                 border-color: var(--secondary);
                 box-shadow: 0 0 8px rgba(108, 92, 231, 0.2);
             }
-            
+
             .submit-btn {
                 width: 100%;
                 background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
@@ -187,16 +187,28 @@
                 transition: all 0.3s ease;
                 font-weight: bold;
             }
-            
+            .ver-btn {
+                width:60%;
+                background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+                color: white;
+                border: none;
+                padding: 10px;
+                font-size: 13px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: bold;
+            }
+
             .submit-btn:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
             }
-            
+
             .links {
                 margin-top: 25px;
             }
-            
+
             .links a {
                 color: var(--primary);
                 text-decoration: none;
@@ -205,7 +217,7 @@
                 display: block;
                 transition: all 0.3s ease;
             }
-            
+
             .links a:hover {
                 color: var(--secondary);
                 transform: translateX(5px);
@@ -229,7 +241,7 @@
                 margin-top: 0.6em;
                 background-color: whitesmoke;
                 border-radius: 0.4em;
-                
+
             }
             .options-container div{
                 padding: 0.7em;
@@ -240,7 +252,7 @@
                 background-color: #4285F4;
                 color: whitesmoke;
             }
-            
+
             @media (max-width: 480px) {
                 .login-container {
                     padding: 25px;
@@ -260,149 +272,147 @@
     </head>
 
     <body>
-        <!-- Add error message section here -->
-         <div class="signup-options-container">
+        <div class="signup-options-container">
             <h1>Sign up as...</h1>
             <div class="options-container">
-                <div id="user-option" class="signup-option">
+                <div id="user-option" class="signup-option active">
                     User
                 </div>
                 <div id="company-option" class="signup-option">
                     Company
                 </div>
             </div>
-         </div>
+        </div>
         <div class="login-container">
-            <div class="logo">
-                <img src=" ../static/images/logo.jpg " alt="LVXIN  Logo ">
+            <div id="error-message" style="color: red; font-size: medium; margin-bottom: 15px; text-align: center; display: none;">
+                <!-- Error message will be populated here -->
             </div>
-
+            <div class="logo">
+                <img src="../static/images/logo.jpg" alt="LVXIN Logo">
+            </div>
             <h1>LVXIN - Sign Up</h1>
-
             <script src="https://static.elfsight.com/platform/platform.js" async></script>
             <div class="elfsight-app-6f017616-600a-46e6-a14a-f6ac550a093e" data-elfsight-app-lazy></div>
-            <div class="social-login ">
-                <button class="social-btn wechat " onclick="wechatSignup() ">
-                <i class="fab fa-weixin "></i> we chat signup 
+            <div class="social-login">
+                <button class="social-btn wechat" onclick="wechatSignup()">
+                    <i class="fab fa-weixin"></i> WeChat Signup
                 </button>
             </div>
-
-            <div class="separator ">或</div>
-            {% if error_message %}
-            <div style="color: red; font-size: medium; margin-bottom: 15px; text-align: center;">
-                {{ error_message }}
-            </div>
-            {% endif %}
-            <form id="user" action='signup' method="POST" enctype="multipart/form-data">
-                
+            <div class="separator">或</div>
+            <form id="user" action="/signup/user" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="fullname">Full Name</label>
-                    <input type="text" id="fullname" name="fullname"  required>
+                    <input type="text" id="fullname" name="fullname" required>
                 </div>
-    
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email"  required>
+                    <input type="email" id="email" name="email" required>
                 </div>
-    
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" placeholder="Create a Unique one"  required>
+                    <input type="text" id="username" name="username" placeholder="Create a Unique one" required>
                 </div>
-
                 <div class="form-group">
                     <label for="phone">Phone</label>
-                    <input type="text" id="phone" name="phone"  >
+                    <input type="text" id="phone" name="phone">
                 </div>
-    
-               
-    
+                <div class="form-group">
+                    <label for="ver-code-user">Verification Code</label>
+                    <input type="text" id="ver-code-user" name="ver-code" placeholder="Enter the code sent to your phone">
+                    <button type="button" id="send-ver-code-user" class="ver-btn">Send Verification Code</button>
+                </div>
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" required>
                 </div>
-    
                 <div class="form-group">
                     <label for="confirm_password">Confirm Password</label>
                     <input type="password" id="confirm_password" name="confirm_password" required>
                 </div>
-
-                <button type="submit " class="submit-btn ">Sign up </button>
-
-
-                <div class="links ">
-                    <a href="signin ">Already have an account? SignIn</a>
+                <button id="user-submit-button" type="submit" class="submit-btn">Sign up</button>
+                <div class="links">
+                    <a href="signin">Already have an account? SignIn</a>
                 </div>
-                </form>
-                <form id="company" action='signup' method="POST" enctype="multipart/form-data">
-                
-                    <div class="form-group">
-                        <label for="fullname-company">Full Company Name</label>
-                        <input type="text" id="fullname-company" name="fullname-company"  required>
-                    </div>
-        
-                    <div class="form-group">
-                        <label for="email-company">Company Email</label>
-                        <input type="email" id="email-company" name="email-company"  required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="Id-company">Company License 'It will be verified'</label>
-                        <input type="text" id="Id-company" name="Id-company"  required>
-                    </div>
+            </form>
+            <form id="company" action="/signup/company" method="POST" enctype="multipart/form-data" style="display: none;">
+                <div class="form-group">
+                    <label for="fullname_company">Company Name</label>
+                    <input type="text" id="fullname_company" name="fullname_company" required>
+                </div>
+                <div class="form-group">
+                    <label for="email_company">Company Email</label>
+                    <input type="email" id="email_company" name="email_company" required>
+                </div>
+                <div class="form-group">
+                    <label for="license_company">Company License</label>
+                    <input type="text" id="license_company" name="license_company" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone_company">Company Phone</label>
+                    <input type="text" id="phone_company" name="phone_company">
+                </div>
+                <div class="form-group">
+                    <label for="ver-code-company">Verification Code</label>
+                    <input type="text" id="ver-code-company" name="ver-code" placeholder="Enter the code sent to your phone">
+                    <button type="button" id="send-ver-code-company" class="ver-btn">Send Verification Code</button>
+                </div>
+                <div class="form-group">
+                    <label for="password_company">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password_company">Confirm Password</label>
+                    <input type="password" id="confirm_password_company" name="confirm_password_company" required>
+                </div>
+                <button id="company-submit-button" type="submit" class="submit-btn">Sign up</button>
+                <div class="links">
+                    <a href="signin">Already have an account? SignIn</a>
+                </div>
+            </form>
+        </div>
+        <script>
+            function wechatSignup() {
+                window.location.href = "https://open.weixin.qq.com/connect/qrconnect?appid=YOUR_APP_ID&redirect_uri=YOUR_REDIRECT_URL&response_type=code&scope=snsapi_login#wechat_redirect";
+            }
     
-                    <div class="form-group">
-                        <label for="phone-company">Company Hotline</label>
-                        <input type="text" id="phone-company" name="phone-company"  >
-                    </div>
-        
-                   
-        
-                    <div class="form-group">
-                        <label for="password-company">Password</label>
-                        <input type="password" id="password-company" name="password-company" required>
-                    </div>
-        
-                    <div class="form-group">
-                        <label for="confirm_password-company">Confirm Password</label>
-                        <input type="password" id="confirm_password-company" name="confirm_password-company" required>
-                    </div>
+            document.addEventListener("DOMContentLoaded", () => {
+                const userForm = document.getElementById("user");
+                const companyForm = document.getElementById("company");
+                const errorMessageDiv = document.getElementById("error-message");
+                let signupContext = "user";
     
-                    <button type="submit " class="submit-btn ">Sign up</button>
-    
-    
-                    <div class="links ">
-                        <a href="signin ">Already have an account? SignIn</a>
-                    </div>
-                    </form>
-            </div>
-            
-            <script>
-                function wechatSignup() {
-                    window.location.href = "https://open.weixin.qq.com/connect/qrconnect?appid=YOUR_APP_ID&redirect_uri=YOUR_REDIRECT_URL&response_type=code&scope=snsapi_login#wechat_redirect ";
-                }
-                document.addEventListener("DOMContentLoaded", ()=> {
-                    const userForm = document.getElementById("user");
-                    const companyForm = document.getElementById("company");
-                    let signup_context = "user";
-                    function changePage(context, userForm, companyForm){
-                        userForm.style.display = "none";
-                        companyForm.style.display = "none";
-                        document.getElementById(context).style.display = "block";
-                        document.querySelectorAll(".signup-option").forEach((o) => {
-                            o.classList.remove("active");
-                        });
-                        document.getElementById(`${context}-option`).classList.add("active");
-                    }
-                    changePage(signup_context, userForm, companyForm);
-                    document.getElementById("user-option").addEventListener("click",(e)=>{
-                        changePage("user", userForm, companyForm);
+                function changePage(context) {
+                    userForm.style.display = context === "user" ? "block" : "none";
+                    companyForm.style.display = context === "company" ? "block" : "none";
+                    document.querySelectorAll(".signup-option").forEach((option) => {
+                        option.classList.remove("active");
                     });
-                    document.getElementById("company-option").addEventListener("click",(e)=>{
-                        changePage("company", userForm, companyForm);
+                    document.getElementById(`${context}-option`).classList.add("active");
+                    signupContext = context;
+                }
+    
+                changePage(signupContext);
+    
+                document.getElementById("user-option").addEventListener("click", () => {
+                    changePage("user");
+                });
+    
+                document.getElementById("company-option").addEventListener("click", () => {
+                    changePage("company");
+                });
+    
+                [userForm, companyForm].forEach((form) => {
+                    form.addEventListener("submit", (e) => {
+                        if (!form.checkValidity()) {
+                            e.preventDefault();
+                            errorMessageDiv.textContent = "Please fill out all required fields correctly.";
+                            errorMessageDiv.style.display = "block";
+                        } else {
+                            errorMessageDiv.style.display = "none";
+                        }
                     });
                 });
-            </script>
+            });
+        </script>
     </body>
-
-</html>
+    </html>
