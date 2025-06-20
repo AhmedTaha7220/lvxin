@@ -1,0 +1,228 @@
+[
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "2D617B00-9C8F-562F-AD86-1BEE4D461737",
+    "Output": {
+      "result": {
+        "examineResult": "此处无需修改",
+        "ruleTag": "简要审查合同主体及合法性",
+        "ruleTitle": "在合同法律引用条款中，确保引用法律文件名称的准确性和有效性",
+        "examineBrief": "本任务为确保合同中引用法律文件名称的准确性和有效性，合同中并未具体引用任何法律文件，因此不存在引用失效或不准确的法律文件的风险。因此，合同文本在此方面不存在缺陷或风险，无需进行修改。",
+        "riskLevel": "normal",
+        "subRisks": [
+          {
+            "resultType": "通过"
+          }
+        ],
+        "ruleSequence": "1.2"
+      },
+      "resultTaskId": "a43245c3-2c08-4355-91d6-ae11640d76f8"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "2D617B00-9C8F-562F-AD86-1BEE4D461737",
+    "Output": {
+      "result": {
+        "examineResult": "需要修改",
+        "ruleTag": "简要审查合同的主要条款",
+        "ruleTitle": "在合同争议解决条款中，争议解决的约定是否完备、合理",
+        "examineBrief": "本任务为审查争议解决条款是否完备、合理。合同中未提及争议解决条款，因此，应当做如下修正，以避免潜在的法律风险。",
+        "riskLevel": "medium",
+        "subRisks": [
+          {
+            "riskClause": "争议解决条款",
+            "riskBrief": "争议解决条款缺失",
+            "riskExplain": "合同中未包含争议解决条款，可能导致未来发生争议时缺乏明确的解决机制，增加法律风险。",
+            "resultType": "需增加",
+            "originalContent": "日期：________年____月____日\n",
+            "resultContent": "13. 争议解决\n因本合同以及本合同项下订单/附件/补充协议等（如有）引起或有关的任何争议，由合同各方协商解决，也可由有关部门调解。协商或调解不成的，应向合同签订地有管辖权的人民法院起诉。"
+          }
+        ],
+        "ruleSequence": "2.3"
+      },
+      "resultTaskId": "a43245c3-2c08-4355-91d6-ae11640d76f8"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "2D617B00-9C8F-562F-AD86-1BEE4D461737",
+    "Output": {
+      "result": {
+        "examineResult": "需要修改",
+        "ruleTag": "简要审查合同主体及合法性",
+        "ruleTitle": "在合同主体条款中，主体信息是否完整、准确， 是否具备主体资格",
+        "examineBrief": "本任务为审查合同主体条款中主体信息是否完整、准确，是否具备主体资格。合同中仅列出了公司名称，未提供法定代表人姓名、统一社会信用代码、银行账户等信息，存在信息不完整的情况。因此，应当做如下修正，以避免潜在的法律风险。",
+        "riskLevel": "medium",
+        "subRisks": [
+          {
+            "riskClause": "合同主体条款",
+            "riskBrief": "主体信息不完整",
+            "riskExplain": "合同中仅列出了公司名称，未提供法定代表人姓名、统一社会信用代码、银行账户等信息，存在信息不完整的情况。",
+            "resultType": "需修改",
+            "originalContent": "甲 方：上海东普信息科技有限公司\n乙 方：深圳市优博讯科技股份有限公司\n",
+            "resultContent": "甲 方：上海东普信息科技有限公司，住所地：上海市浦东新区XX路XX号，法定代表人：___，统一社会信用代码：___，银行账户：___\n乙 方：深圳市优博讯科技股份有限公司，住所地：深圳市南山区XX路XX号，法定代表人：___，统一社会信用代码：___，银行账户：___"
+          }
+        ],
+        "ruleSequence": "1.1"
+      },
+      "resultTaskId": "a43245c3-2c08-4355-91d6-ae11640d76f8"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "2D617B00-9C8F-562F-AD86-1BEE4D461737",
+    "Output": {
+      "result": {
+        "examineResult": "需要修改",
+        "ruleTag": "简要审查合同主体及合法性",
+        "ruleTitle": "审查合同主体资格",
+        "examineBrief": "本任务为审查合同主体资格。合同中虽然明确了双方的名称，但未提供统一社会信用代码等进一步的身份证明信息，存在法律风险，因此，应当做如下修正，以避免潜在的法律风险。",
+        "riskLevel": "medium",
+        "subRisks": [
+          {
+            "riskClause": "合同主体条款",
+            "riskBrief": "未提供统一社会信用代码等进一步的身份证明信息",
+            "riskExplain": "合同中仅列出了双方的名称，但未提供统一社会信用代码等进一步的身份证明信息，存在法律风险。",
+            "resultType": "需修改",
+            "originalContent": "甲 方：上海东普信息科技有限公司\n乙 方：深圳市优博讯科技股份有限公司\n",
+            "resultContent": "甲 方：上海东普信息科技有限公司（统一社会信用代码：___） 乙 方：深圳市优博讯科技股份有限公司（统一社会信用代码：___）"
+          }
+        ],
+        "ruleSequence": "1.3"
+      },
+      "resultTaskId": "a43245c3-2c08-4355-91d6-ae11640d76f8"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "2D617B00-9C8F-562F-AD86-1BEE4D461737",
+    "Output": {
+      "result": {
+        "examineResult": "需要修改",
+        "ruleTag": "简要审查合同的主要条款",
+        "ruleTitle": "在合同形式与生效条款中，合同生效与签订日期审查",
+        "examineBrief": "本任务为审查合同的生效日期或生效条件以及签订日期。合同中未明确具体的生效日期或生效条件，也未填写具体的签订日期，因此，应当做如下修正，以避免潜在的法律风险。",
+        "riskLevel": "high",
+        "subRisks": [
+          {
+            "riskClause": "合同生效条款",
+            "riskBrief": "未明确具体的生效日期或生效条件",
+            "riskExplain": "合同中未明确具体的生效日期或生效条件，可能导致法律效力上的不确定性，增加潜在的法律风险。",
+            "resultType": "需修改",
+            "originalContent": "以资双方共同遵守：",
+            "resultContent": "以资双方共同遵守：\n\n本协议自双方法定代表人或授权代表签字并加盖公章之日起生效。"
+          },
+          {
+            "riskClause": "签订日期",
+            "riskBrief": "未填写具体的签订日期",
+            "riskExplain": "合同中未填写具体的签订日期，可能导致法律效力上的不确定性，增加潜在的法律风险。",
+            "resultType": "需修改",
+            "originalContent": "日期： 年 月____日 日期：________年____月____日",
+            "resultContent": "日期：2022年04月01日 日期：2022年04月01日"
+          }
+        ],
+        "ruleSequence": "2.4"
+      },
+      "resultTaskId": "a43245c3-2c08-4355-91d6-ae11640d76f8"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "2D617B00-9C8F-562F-AD86-1BEE4D461737",
+    "Output": {
+      "result": {
+        "examineResult": "需要修改",
+        "ruleTag": "简要审查合同的主要条款",
+        "ruleTitle": "在合同标的条款中，审查标的的合法性、标的名称和数量的明确性和规范性，以及标的的特定性",
+        "examineBrief": "本任务为审查标的的合法性、标的名称和数量的明确性和规范性，以及标的的特定性。合同中虽然明确了产品名称、单位、价格和税率，但未详细描述产品的具体特性，如颜色、配置等，这可能导致标的物无法完全特定化。因此，应当做如下修正，以避免潜在的法律风险。",
+        "riskLevel": "high",
+        "subRisks": [
+          {
+            "riskClause": "合同内容变更",
+            "riskBrief": "标的物特性不明确",
+            "riskExplain": "合同中虽然明确了产品名称、单位、价格和税率，但未详细描述产品的具体特性，如颜色、配置等，这可能导致标的物无法完全特定化。",
+            "resultType": "需修改",
+            "originalContent": "项目 产品名称及型号 单位 含税单价(元/套) 税率\n1 工业手机 M9 台 1380 13%\n",
+            "resultContent": "项目 产品名称及型号 单位 含税单价(元/套) 税率 1 工业手机 M9（具体配置：处理器 - ___，内存 - ___，存储 - ___，屏幕尺寸 - ___，颜色 - ___） 台 1380 13%"
+          }
+        ],
+        "ruleSequence": "2.1"
+      },
+      "resultTaskId": "a43245c3-2c08-4355-91d6-ae11640d76f8"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 0,
+      "unit": "page"
+    },
+    "RequestId": "2D617B00-9C8F-562F-AD86-1BEE4D461737",
+    "Output": {
+      "result": {
+        "examineResult": "需要修改",
+        "ruleTag": "简要审查合同的主要条款",
+        "ruleTitle": "在合同违约责任条款中，根据双方的合同义务确定违约责任",
+        "examineBrief": "本任务为审查违约责任条款。合同中未明确规定卖方和买方在各种违约情况下的具体责任，因此，应当做如下修正，以避免潜在的法律风险。",
+        "riskLevel": "high",
+        "subRisks": [
+          {
+            "riskClause": "违约责任条款",
+            "riskBrief": "未明确规定卖方和买方在各种违约情况下的具体责任",
+            "riskExplain": "由于合同中未明确规定卖方和买方在各种违约情况下的具体责任，可能导致在合同履行过程中，当一方出现违约行为时，无法有效追究违约方的责任，从而影响合同的顺利履行。",
+            "resultType": "需增加",
+            "originalContent": "二、 除本协议涉及的价格其它方面条款均以原框架合同（合同编号：DP&YBX20210510-01）为准。",
+            "resultContent": "三、 违约责任\n1. 卖方违约责任：\n（1）卖方未按照合同约定的时间交付货物的，每逾期一天，应当按照总货款的___%支付违约金，逾期超过___天的，买方有权解除合同并要求卖方支付违约金。\n（2）卖方交付的货物不符合合同约定的质量标准的，应当承担违约责任，买方有权拒收货物并要求卖方更换或退货，同时卖方应支付总货款的___%作为违约金。\n（3）卖方未能按照合同约定提供售后服务的，买方有权向第三方购买同类服务，因此支出的费用有权向卖方追索（或从质保金中予以扣除）。\n2. 买方违约责任：\n（1）买方未及时受领货物的，每逾期一天，应当按照总货款的___%支付违约金，并承担卖方因此支出的仓储费、运输费及相关费用。\n（2）买方未及时验收的，视为货物符合合同约定。\n（3）买方未按照合同约定的时间和数额支付货款的，每逾期一天，应当按照其所拖欠货款的___%支付违约金，逾期超过___天的，卖方有权解除合同并要求买方支付违约金。"
+          }
+        ],
+        "ruleSequence": "2.2"
+      },
+      "resultTaskId": "a43245c3-2c08-4355-91d6-ae11640d76f8"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  },
+  {
+    "Usage": {
+      "input": 1,
+      "unit": "page"
+    },
+    "RequestId": "2D617B00-9C8F-562F-AD86-1BEE4D461737",
+    "Output": {
+      "result": {},
+      "resultTaskId": "a43245c3-2c08-4355-91d6-ae11640d76f8"
+    },
+    "Success": true,
+    "httpStatusCode": "200"
+  }
+]

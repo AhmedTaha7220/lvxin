@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../static/css/stylee.css">
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <style>
         /* Color Scheme */
         :root {
@@ -64,6 +65,7 @@
             display: flex;
             min-height: 100vh;
             padding-top: 64px;
+            padding-right: var(--sidebar-width);
         }
 
         /* Navbar styles */
@@ -170,8 +172,9 @@
             color: var(--text-primary);
             font-size: 0.85rem;
         }
-        
+
         /* Sidebar Styles */
+
         .sidebar {
             width: var(--sidebar-width);
             background: var(--sidebar-bg);
@@ -184,14 +187,28 @@
             overflow-y: auto;
             box-shadow: 1px 0 6px rgba(0, 0, 0, 0.1);
             z-index: 999;
+            padding-top: 8vh;
+            transform: translateX(-100%);
         }
-
+        #right-sidebar{
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: white;
+            top: 64px;
+            position: fixed;
+            right: 0;
+            height: calc(100vh - 64px);
+            padding: 1rem 0;
+            overflow-y: auto;
+            box-shadow: 1px 0 6px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+        }
         [data-theme="dark"] .sidebar {
             background: linear-gradient(180deg, var(--primary), var(--secondary));
         }
-        
 
-        
+
+
         .nav-title {
             color: rgba(255, 255, 255, 0.7);
             font-size: 0.7rem;
@@ -200,7 +217,7 @@
             padding: 10px 15px 5px;
             font-weight: 600;
         }
-        
+
         .nav-item {
             display: flex;
             align-items: center;
@@ -211,20 +228,20 @@
             text-decoration: none;
             font-size: 0.85rem;
         }
-        
+
         .nav-item i {
             margin-right: 8px;
             font-size: 1rem;
             width: 18px;
             text-align: center;
         }
-        
+
         .nav-item:hover {
             background: rgba(255, 255, 255, 0.1);
             color: white;
             transform: translateX(3px);
         }
-        
+
         .nav-item.active {
             background: rgba(255, 255, 255, 0.2);
             color: white;
@@ -233,7 +250,7 @@
         [data-theme="dark"] .nav-item.active {
             background: rgba(255, 255, 255, 0.15);
         }
-        
+
         /* Contract Sections */
         .contract-section {
             padding: 8px 16px;
@@ -243,25 +260,25 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        
+
         .contract-section:hover {
             background: rgba(255, 255, 255, 0.1);
             border-left-color: white;
         }
-        
+
         .contract-section.active {
             background: rgba(255, 255, 255, 0.2);
             border-left-color: var(--danger);
             font-weight: 600;
         }
-        
+
         /* Main Content Styles */
         .main-content {
-            margin-left: var(--sidebar-width);
             padding: 1.5rem 2rem;
             flex: 1;
             margin-top: 64px;
             transition: margin-left 0.2s ease;
+            margin-right: var(--sidebar-width);
         }
 
         /* Tab Navigation */
@@ -281,7 +298,7 @@
             display: flex;
             gap: 10px;
         }
-
+        #sidebar-listener,
         .tab-btn {
             padding: 10px 20px;
             background: var(--background);
@@ -368,22 +385,22 @@
             color: #f72585;
             font-weight: bold;
         }
-        
+
         .risk-medium {
             color: #f8961e;
             font-weight: bold;
         }
-        
+
         .risk-normal {
             color: #4cc9f0;
             font-weight: bold;
         }
-        
+
         .risk-low {
             color: #38b000;
             font-weight: bold;
         }
-        
+
         /* Content sections */
         .content-section {
             margin-bottom: 20px;
@@ -391,7 +408,7 @@
             background: var(--background);
             border-radius: 5px;
         }
-        
+
         pre {
             white-space: pre-wrap;
             background: var(--card-bg);
@@ -417,7 +434,7 @@
             flex-wrap: wrap;
             gap: 20px;
         }
-        
+
         .risk-chart-container {
             flex: 1;
             min-width: 300px;
@@ -427,7 +444,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             border: 1px solid var(--border);
         }
-        
+
         .risk-details-container {
             flex: 1;
             min-width: 300px;
@@ -435,7 +452,7 @@
             flex-direction: column;
             gap: 20px;
         }
-        
+
         .risk-clause-card {
             background: var(--card-bg);
             padding: 20px;
@@ -443,7 +460,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             border: 1px solid var(--border);
         }
-        
+
         .risk-analysis-card {
             background: var(--card-bg);
             padding: 20px;
@@ -451,7 +468,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             border: 1px solid var(--border);
         }
-        
+
         .risk-brief {
             margin-top: 15px;
             padding: 15px;
@@ -459,12 +476,12 @@
             border-radius: 8px;
             display: none;
         }
-        
+
         .risk-brief.show {
             display: block;
             animation: fadeIn 0.3s ease;
         }
-        
+
         .summarize-btn {
             background: var(--primary);
             color: white;
@@ -476,11 +493,11 @@
             transition: background 0.3s ease;
             margin-top: 10px;
         }
-        
+
         .summarize-btn:hover {
             background: var(--secondary);
         }
-        
+
         .chart-container {
             position: relative;
             height: 300px;
@@ -494,7 +511,7 @@
             max-width: 900px;
             margin: 0 auto;
         }
-        
+
         .modification-item {
             background: var(--card-bg);
             border-radius: 8px;
@@ -504,18 +521,18 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             border: 1px solid var(--border);
         }
-        
+
         .modification-item:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.12);
         }
-        
+
         .modification-header {
             background: var(--background);
             padding: 15px 20px;
             border-bottom: 1px solid var(--border);
         }
-        
+
         .modification-header h3 {
             margin: 0;
             color: var(--text-primary);
@@ -523,7 +540,7 @@
             display: flex;
             align-items: center;
         }
-        
+
         .action-tag {
             display: inline-block;
             background: var(--primary);
@@ -533,34 +550,34 @@
             font-size: 0.8em;
             margin-left: 10px;
         }
-        
+
         .content-comparison {
             display: flex;
             flex-direction: column;
             padding: 0;
         }
-        
+
         .original-content, .suggested-content {
             padding: 20px;
             position: relative;
         }
-        
+
         .original-content {
             background: #fff5f5;
             border-left: 4px solid #ff6b6b;
         }
-        
+
         .suggested-content {
             background: #f5fff7;
             border-left: 4px solid #51cf66;
         }
-        
+
         .content-header {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
         }
-        
+
         .content-icon {
             width: 24px;
             height: 24px;
@@ -570,23 +587,24 @@
             justify-content: center;
             border-radius: 50%;
         }
-        
+
         .original-icon {
             background: #ff6b6b;
             color: white;
         }
-        
+
         .suggested-icon {
             background: #51cf66;
             color: white;
         }
-        
+
         .content-header h4 {
             margin: 0;
             font-size: 1em;
             color: var(--text-primary);
         }
-        
+
+
         pre {
             white-space: pre-wrap;
             margin: 0;
@@ -625,6 +643,20 @@
             margin-left: 10px;
         }
 
+        #chat-container{
+            height: 50vh;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        #messages-container {
+            height: 75%;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
         /* Modification Group Box */
         .modification-item {
             background-color: var(--card-bg);
@@ -633,6 +665,75 @@
             margin-bottom: 24px;
             padding: 16px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        #input-container{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .cssbuttons-io-button {
+          background: #3f37c9;
+          color: white;
+          font-family: inherit;
+          padding: 0.125em;
+          padding-left: 1.2em;
+          font-size: 17px;
+          font-weight: 500;
+          border-radius: 0.9em;
+          border: none;
+          letter-spacing: 0.05em;
+          display: flex;
+          align-items: center;
+          box-shadow: inset 0 0 1.6em -0.6em #714da6;
+          overflow: hidden;
+          position: relative;
+          height: 2.1em;
+          padding-right: 3.3em;
+          cursor: pointer;
+        }
+        #user-input{
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            background: var(--background);
+            height: 2.4em;
+        }
+        .cssbuttons-io-button .icon {
+          background: white;
+          margin-left: 1em;
+          position: absolute;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 2em;
+          width: 2.2em;
+          border-radius: 0.7em;
+          box-shadow: 0.1em 0.1em 0.6em 0.2em #7b52b9;
+          right: 0.3em;
+          transition: all 0.3s;
+        }
+
+        .cssbuttons-io-button:hover .icon {
+          width: calc(100% - 0.6em);
+        }
+
+        .cssbuttons-io-button .icon svg {
+          width: 1.1em;
+          transition: transform 0.3s;
+          color: #7b52b9;
+        }
+
+        .cssbuttons-io-button:hover .icon svg {
+          transform: translateX(0.1em);
+        }
+
+        .cssbuttons-io-button:active .icon {
+          transform: scale(0.95);
         }
 
         /* Headings */
@@ -686,18 +787,52 @@
             line-height: 1.5;
             background: var(--background);
         }
-
+        #sidebar-listener{
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1001;
+            margin-top: 11vh;
+            margin-left: 1vw;
+        }
+        #download-chat-button{
+            background-color: #3f37c9;
+            color: #f5fff7;
+            padding: 0.5em;
+            cursor: pointer;
+            border: none;
+            border-radius: 0.2em;
+            font-size: 0.9rem;
+        }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
-
+        .user-message {
+            background: #e0f7fa;
+            color: #006064;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            max-width: 80%;
+            align-self: flex-end;
+        }
+        .ai-message {
+            background: #f5fff7;
+            color: #333;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            max-width: 80%;
+            align-self: flex-start;
+        }
         /* Responsive adjustments */
         @media (max-width: 1024px) {
             .main-content {
                 margin-left: 0;
                 padding-top: 100px;
             }
+            #right-sidebar,
             .sidebar {
                 width: 100%;
                 height: auto;
@@ -741,13 +876,13 @@
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .tab-group {
                 width: 100%;
                 overflow-x: auto;
                 padding-bottom: 5px;
             }
-            
+
             .tab-actions {
                 width: 100%;
                 justify-content: flex-end;
@@ -765,52 +900,63 @@
             }
         }
     </style>
-    <body>
-        <!-- 导航栏 -->
-        <nav class="navbar">
-            <div class="logo">
-                <a href="welcome_page">
-                    <img src="../static/images/logo.jpg" alt="绿信标志">
-                </a>
-            </div>
-            <div class="actions">
-                <button id="themeToggle" class="icon-btn">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <!-- Elfsight 网站翻译器 | 无标题网站翻译器 -->
-                <script src="https://static.elfsight.com/platform/platform.js" async></script>
-                <div class="elfsight-app-fce75b10-069c-41d5-bca0-09c33e812801" data-elfsight-app-lazy></div>
-    
-                <a href="profile" class="profile-component">
-                    <img src="../static/images/profile.jpeg" class="profile-image" alt="个人资料图片">
-                    <span class="profile-name">{{name}}</span>
-                </a>
-            </div>
-        </nav>
-    
-        <!-- 侧边栏 -->
-        <nav class="sidebar">
-            <div class="nav-section">
-                <div class="nav-title">合同</div>
-            <a href="mydash" class="nav-item"> <i class="fas fa-bar-chart"></i> 仪表板 </a>
-            <a href="upload_contract" class="nav-item"> <i class="fas fa-file-upload"></i> 上传合同 </a>
-            <a href="history" class="nav-item"> <i class="fas fa-history"></i> 分析历史 </a>
-            <a href="analysis" class="nav-item active"> <i class="fas fa-folder-open"></i> 文档分析 </a>
+</head>
+<body style="position: relative;" >
+    <!-- Header -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="welcome_page">
+                <img src="../static/images/logo.jpg" alt="Company Logo">
+            </a>
         </div>
-        <div class="nav-section">
-            <div class="nav-title">账户</div>
-            <a href="profile" class="nav-item"> <i class="fas fa-user"></i> 用户资料 </a>
-            <a href="subscriptions" class="nav-item"> <i class="fas fa-star"></i> 订阅 </a>
+
+        <div class="nav-links">
+            <a href="subscriptions" class="en-content">Pricing</a>
+            <a href="aboutus" class="en-content">About Us</a>
+            <a href="helpcenter" class="en-content">Help Center</a>
         </div>
-        <div class="nav-section">
-            <div class="nav-title">支持</div>
-            <a href="contactus" class="nav-item"> <i class="fas fa-envelope"></i> 联系我们 </a>
-            <a href="helpcenter" class="nav-item"> <i class="fas fa-question-circle"></i> 常见问题 </a>
-            <a href="aboutus" class="nav-item"> <i class="fas fa-info-circle"></i> 关于我们 </a>
-            <a href="whats-new" class="nav-item "><i class="fas fa-info-circle"></i>有什么新的</a>
+        <div class="actions">
+            <button id="themeToggle" class="icon-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+            <!-- Elfsight website translator -->
+            <script src="https://static.elfsight.com/platform/platform.js" async></script>
+            <div class="elfsight-app-fce75b10-069c-41d5-bca0-09c33e812801" data-elfsight-app-lazy></div>
+
+            <a href="profile" class="profile-component">
+                <img src="../static/images/profile.jpeg" class="profile-image" alt="Profile Image">
+                <span class="profile-name">{{name}}</span>
+            </a>
         </div>
     </nav>
+    <button id="sidebar-listener" class="active">
+        Menu
+    </button>
+    <!-- Sidebar -->
+     <nav id="right-sidebar">
 
+    </nav>
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-section">
+            <h3 class="nav-title">Team Database</h3>
+            <a href="mydash" class="nav-item"> <i class="fas fa-bar-chart"></i> 上传合同 </a>
+            <a href="upload_contract" class="nav-item"><i class="fas fa-file-upload"></i> Upload Contract</a>
+            <a href="history" class="nav-item"><i class="fas fa-history"></i> Analysis History</a>
+            <a href="Analytics_Dashboard" class="nav-item active"><i class="fas fa-file-contract"></i> Document Analysis</a>
+        </div>
+        <div class="nav-section">
+            <h3 class="nav-title">Account</h3>
+            <a href="profile" class="nav-item"><i class="fas fa-user"></i> User Profile</a>
+            <a href="subscriptions" class="nav-item"><i class="fas fa-star"></i> Subscriptions</a>
+        </div>
+        <div class="nav-section">
+            <h3 class="nav-title">Support</h3>
+            <a href="contactus" class="nav-item"><i class="fas fa-envelope"></i> Contact Us</a>
+            <a href="helpcenter" class="nav-item"><i class="fas fa-question-circle"></i> FAQs</a>
+            <a href="aboutus" class="nav-item"><i class="fas fa-info-circle"></i> About Us</a>
+            <a href="whats-new" class="nav-item"><i class="fas fa-info-circle"></i> What's New</a>
+        </div>
+    </nav>
     <!-- Main Content Area -->
     <main class="main-content">
         <!-- Tab Navigation -->
@@ -819,17 +965,17 @@
                 <button class="tab-btn active" data-tab="overview">
                     <i class="fas fa-chart-pie"></i> Overview
                 </button>
-                <button class="tab-btn" data-tab="risks">
-                    <i class="fas fa-exclamation-triangle"></i> Risks
+                <button class="tab-btn" data-tab="risks-and-suggestions">
+                    <i class="fas fa-exclamation-triangle"></i> Risks <i class="fas"></i> & <i class="fas fa-lightbulb"></i> Suggestions
                 </button>
-                <button class="tab-btn" data-tab="suggestions">
-                    <i class="fas fa-lightbulb"></i> Suggestions
+                <button class="tab-btn" data-tab="chat">
+                    <i class="fas fa-comments"></i>Chat
                 </button>
                 <button class="tab-btn" onclick="window.location.href='document'">
                     <i class="fas fa-file-alt"></i> Document
                 </button>
             </div>
-            
+
             <div class="tab-actions">
                 <button class="action-btn primary">
                     <i class="fas fa-file-pdf"></i> Export to PDF
@@ -845,44 +991,78 @@
 
         <!-- Tab Contents -->
         <div id="overview-tab" class="overview-container tab-content active"></div>
+        <div id="risks-and-suggestions-tab" class="tab-content">
+            <div id="risks-tab">
+                <div class="risk-container">
+                    <div class="risk-chart-container">
+                        <h2>Risk Distribution <span class="rule-sequence">1.1</span></h2>
+                        <div class="chart-container">
+                            <canvas id="riskChart"></canvas>
+                        </div>
+                    </div>
 
-        <div id="risks-tab" class="tab-content">
-            <div class="risk-container">
-                <div class="risk-chart-container">
-                    <h2>Risk Distribution <span class="rule-sequence">1.1</span></h2>
-                    <div class="chart-container">
-                        <canvas id="riskChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="risk-details-container">
-                    <div class="risk-clause-card">
-                        <h2>Risk Clause</h2>
-                        <p>Contract party qualifications not clearly specified</p>
-                    </div>
-                    
-                    <div class="risk-analysis-card">
-                        <h2>Risk Analysis</h2>
-                        <p>Since the contract text does not clearly specify the specific identity information of Party A and Party B, such as whether a natural person has full civil capacity or whether a legal person is legally established and validly existing, nor does it mention that both parties need to show each other proof of identity and existence and qualifications before signing the contract, there may be legal risks during contract execution.</p>
-                        <button class="summarize-btn">Summarize Risk</button>
-                        <div class="risk-brief">
-                            <h3>Risk Brief</h3>
-                            <p>The contract lacks clear identification requirements for both parties, which could lead to legal issues regarding the validity and enforceability of the contract.</p>
+                    <div class="risk-details-container">
+                        <div class="risk-clause-card">
+                            <h2>Risk Clause</h2>
+                            <p>Contract party qualifications not clearly specified</p>
+                        </div>
+
+                        <div class="risk-analysis-card">
+                            <h2>Risk Analysis</h2>
+                            <p>Since the contract text does not clearly specify the specific identity information of Party A and Party B, such as whether a natural person has full civil capacity or whether a legal person is legally established and validly existing, nor does it mention that both parties need to show each other proof of identity and existence and qualifications before signing the contract, there may be legal risks during contract execution.</p>
+                            <button class="summarize-btn">Summarize Risk</button>
+                            <div class="risk-brief">
+                                <h3>Risk Brief</h3>
+                                <p>The contract lacks clear identification requirements for both parties, which could lead to legal issues regarding the validity and enforceability of the contract.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <div id="suggestions-tab">
+                <h2>Suggestions Page</h2>
+                <p>This is the suggestions page showing recommended amendments.</p>
+                <p>It will display original content alongside suggested modifications from the API.</p>
+            </div>
         </div>
 
-        <div id="suggestions-tab" class="tab-content">
-            <h2>Suggestions Page</h2>
-            <p>This is the suggestions page showing recommended amendments.</p>
-            <p>It will display original content alongside suggested modifications from the API.</p>
+
+        <div id="chat-tab" class="tab-content">
+            <div id="chat-container">
+                <h1>Chat</h1>
+                <div id="messages-container">
+
+                </div>
+                <div id="input-container">
+                    <button id="download-chat-button" title="Download chat">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <input type="text" id="user-input" placeholder="Type your message here...">
+                    <button id="send-button" class="cssbuttons-io-button">
+                      Send
+                      <div class="icon">
+                        <svg
+                          height="24"
+                          width="24"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M0 0h24v24H0z" fill="none"></path>
+                          <path
+                            d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z"
+                            fill="currentColor"
+                          ></path>
+                        </svg>
+                      </div>
+                    </button>
+                </div>
+            </div>
         </div>
+
 
        <div id="document-tab" class="tab-content">
             <div style="text-align: center; padding: 40px;">
-                <button id="viewDocumentBtn" class="nav-button" 
+                <button id="viewDocumentBtn" class="nav-button"
                         style="padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem;">
                     <i class="fas fa-file-alt"></i> View Full Document
                 </button>
@@ -890,12 +1070,13 @@
         </div>
 
         <script>
+
             // Tab functionality
             document.querySelectorAll('.tab-btn').forEach(button => {
                 button.addEventListener('click', () => {
                     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
                     button.classList.add('active');
-                    
+
                     const tabId = button.getAttribute('data-tab');
                     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
                     document.getElementById(`${tabId}-tab`).classList.add('active');
@@ -937,7 +1118,24 @@
     <!-- <script src="../static/js/script.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-    const apiResponse = {{output|tojson}}
+    $(document).ready(function() {
+        $("#sidebar-listener").css("backgroundColor", "#4361EE");
+        $("#sidebar-listener").css("color", "#fff");
+        $("#sidebar-listener").on("click", function() {
+            const sidebar = $("#sidebar");
+            const current = sidebar.css("transform");
+            if (current === "matrix(1, 0, 0, 1, -240, 0)" || current === "none") {
+                sidebar.css("transform", "translateX(0)");
+                $(this).css("backgroundColor", "#fff");
+                $(this).css("color", "#333");
+            } else {
+                sidebar.css("transform", "translateX(-240px)");
+                $(this).css("backgroundColor", "#4361EE");
+                $(this).css("color", "#fff");
+            }
+        });
+    });
+    const apiResponse = {{ output|tojson | safe }};
     // Theme Toggle Functionality (same as original)
     const themeToggle = document.getElementById('themeToggle');
     let isDarkMode = localStorage.getItem('darkMode') === 'true';
@@ -1049,7 +1247,7 @@
         // Set all segments to the same color based on overall risk level
         riskData.datasets[0].backgroundColor = Array(4).fill(color);
     }
-
+    let currentContractSection = apiResponse[0];
     // Function to create contract sections in sidebar
     function createContractSections(data) {
         const teamDatabaseSection = document.querySelector('.nav-section:first-child');
@@ -1075,10 +1273,10 @@
                 // Handle both array and single object cases
                 const itemsArray = Array.isArray(ruleItems) ? ruleItems : [ruleItems];
                 
-                itemsArray.forEach(item => {
+                itemsArray.forEach((item, index) => {
                     if (item && item.Output && item.Output.result) {
                         const result = item.Output.result;
-
+                        item.messages = [];
                         const contractSection = document.createElement('div');
                         contractSection.className = 'contract-section';
                         contractSection.innerHTML = `${result.ruleTitle} <span class="rule-sequence">${result.ruleSequence}</span>`;
@@ -1089,15 +1287,16 @@
                             document.querySelectorAll('.contract-section').forEach(section => section.classList.remove('active'));
                             this.classList.add('active');
                             loadContractDetails(JSON.parse(this.dataset.result));
+                            currentContractSection = item;
+                            updateMessagesContainer(currentContractSection.messages || []);
                         });
-
                         contractSectionsContainer.appendChild(contractSection);
                     }
                 });
             });
         }
 
-        teamDatabaseSection.insertAdjacentElement('afterend', contractSectionsContainer);
+        $("#right-sidebar").append(contractSectionsContainer);
         
         // Activate the first section if any exists
         const firstContractSection = contractSectionsContainer.querySelector('.contract-section');
@@ -1275,6 +1474,7 @@
                 riskMarker.style.backgroundColor = color;
             }, 50);
         }
+        updateMessagesContainer(currentContractSection.messages);
 
         // Populate Risks Tab
         if (result.subRisks && result.subRisks.length > 0) {
@@ -1387,8 +1587,65 @@
             window.location.href = 'document.html';
         });
 
-    }
+    };
 
+        function updateMessagesContainer(messages) {
+            $('#messages-container').empty();
+            messages.forEach(message => {
+                classname = message.role === 'user' ? 'user-message' : 'ai-message';
+                $('#messages-container').append(`<div class="${classname}">`+ message.content + '</div>');
+            });
+            $('#messages-container').scrollTop($('#messages-container')[0].scrollHeight);
+        }
+        async function sendMessageToAI(message) {
+            currentContractSection.messages.push({ role: 'user', content: message });
+            updateMessagesContainer(currentContractSection.messages);
+            const {messages, ...document_details} = currentContractSection;
+            await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ messages: messages, document_details: document_details })
+            }).then(async response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                let data = await response.json();
+                currentContractSection.messages.push({ role: data.message.role, content: data.message.content });
+                updateMessagesContainer(currentContractSection.messages);
+
+            }).catch(error => {
+                  console.error('Error:', error);
+                  $('#messages-container').append('<div><strong>Error:</strong> ' + error.message + '</div>');
+            });
+        }
+        $('#send-button').click(function() {
+            const userInput = $('#user-input').val();
+            if (userInput.trim() === '') return;
+
+            // Append user message to the chat container
+            $('#messages-container').append('<div><strong>You:</strong> ' + userInput + '</div>');
+            $('#user-input').val(''); // Clear input field
+            sendMessageToAI(userInput);
+        });
+        $('#user-input').keypress(function(event) {
+            if( event.which === 13 && !event.shiftKey) { // Enter key without Shift
+                event.preventDefault(); // Prevent default newline behavior
+                const userInput = $('#user-input').val();
+                if (userInput.trim() === '') return;
+
+                // Append user message to the chat container
+                $('#messages-container').append('<div><strong>You:</strong> ' + userInput + '</div>');
+                $('#user-input').val(''); // Clear input field
+                sendMessageToAI(userInput);
+            }else if (event.which === 13 && event.shiftKey) {
+                // Allow Shift + Enter to create a new line
+                const currentText = $('#user-input').val();
+                $('#user-input').val(currentText + '\n');
+
+            }
+        });
     // Initialize the application when DOM is loaded
     document.addEventListener('DOMContentLoaded', () => {
         // Tab switching functionality
@@ -1426,7 +1683,24 @@
                 </div>
             `;
         }
+        function exportMessagesAsTxt(messages) {
+            const text = messages.map(m => `${m.role}: ${m.content}`).join('\n');
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
 
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'chat.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Example: Attach to your download button
+        document.getElementById('download-chat-button').addEventListener('click', function() {
+            exportMessagesAsTxt(currentContractSection.messages || []);
+        });
         // Document Analysis click handler - now just marks as active
         document.querySelector('.nav-item[href="Analytics_Dashboard"]')?.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1436,7 +1710,7 @@
                 item.classList.remove('active');
             });
             this.classList.add('active');
-        });
+        })
     });
 </script>
 </body>
