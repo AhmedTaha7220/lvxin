@@ -487,35 +487,48 @@ app = FastAPI() # Define your main app
 ht_pages = Jinja2Templates(directory="templates") # Define our html location
 app.mount("/static", StaticFiles(directory="static"), name="static") # Define our additional files location
 
-# @app.get("/pdf/{foldername}/{filename}")
-# def get_pdf(foldername,filename: str):
-#     # Build the full path securely
-#     base_dir = "D:/Main_Project/users"
-#     file_path = os.path.join(base_dir, foldername, filename)
-#     print(file_path)
-#     if not os.path.isfile(file_path):
-#         raise HTTPException(status_code=404, detail="File not found")
-#     return FileResponse(path=file_path, media_type='application/pdf', filename=filename)
-@app.get("/pdf/{foldername}/{filename}")
-async def get_pdf(foldername: str, filename: str):
-    # Build the full path securely
-    file_path = os.path.join(USERS_DIR, foldername, filename)
+import magic
+
+# Initialize file type detection
+mime = magic.Magic(mime=True)
+
+
+@app.get("/file/{foldername}/{filename}")
+async def get_file(foldername: str, filename: str):
+    # Decode URL-encoded filename (handles Chinese characters)
+    decoded_filename = urllib.parse.unquote(filename)
+    file_path = os.path.join(USERS_DIR, foldername, decoded_filename)
     print(f"Requested file path: {file_path}")
-    
-    # Normalize path to prevent path traversal issues
+
+    # Normalize path to prevent path traversal
     file_path = os.path.normpath(file_path)
-    
-    # Ensure the file exists
+
+    # Check if file exists
     if not os.path.isfile(file_path):
         print(f"File not found: {file_path}")
         raise HTTPException(status_code=404, detail="File not found")
+
+    # Validate file is PDF or DOCX
+    file_mime = mime.from_file(file_path)
+    valid_mime_types = {
+        "application/pdf": "pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+        "application/msword": "doc"
+    }
+    
+    if file_mime not in valid_mime_types:
+        print(f"Invalid file type: {file_mime}, expected PDF or DOCX")
+        raise HTTPException(status_code=400, detail="File must be a PDF or DOCX or DOC")
+
+    # Set appropriate Content-Disposition header for download
+    content_disposition = f"attachment; filename*=UTF-8''{urllib.parse.quote(decoded_filename)}"
     
     return FileResponse(
         path=file_path,
-        media_type='application/pdf',
-        filename=filename
+        media_type=file_mime,
+        filename=decoded_filename,
+        headers={"Content-Disposition": content_disposition}
     )
-
 
 @app.get("/", response_class=HTMLResponse)
 async def root_page(req:Request):
@@ -1328,6 +1341,7 @@ def get_pdf(filename: str):
     return FileResponse(path=file_path, media_type='application/pdf', filename=filename)
 
 
+
 @app.get("/document", response_class=HTMLResponse)
 async def document(req: Request, filename: str = None):
     user_id = req.cookies.get("user_id")
@@ -1372,20 +1386,22 @@ async def document(req: Request, filename: str = None):
             """
             cur.execute(query, (user_id,))
     else:
+        # Decode filename if provided in query (handles Chinese characters)
+        decoded_filename = urllib.parse.unquote(filename)
         if flag == "0":
             query = """
                 SELECT report_name
                 FROM files
                 WHERE user_id = %s AND file_name = %s
             """
-            cur.execute(query, (user_id, filename))
+            cur.execute(query, (user_id, decoded_filename))
         else:
             query = """
                 SELECT report_name
                 FROM comp_files
                 WHERE comp_id = %s AND file_name = %s
             """
-            cur.execute(query, (user_id, filename))
+            cur.execute(query, (user_id, decoded_filename))
 
     result = cur.fetchone()
     if not result:
@@ -1393,7 +1409,7 @@ async def document(req: Request, filename: str = None):
 
     # Extract report_name and file_name
     report_name = result[0]
-    file_name = filename if filename else result[1]
+    file_name = decoded_filename if filename else result[1]
     
     # Construct file path and validate
     file_path = os.path.join(user_folder, file_name)
@@ -1401,11 +1417,26 @@ async def document(req: Request, filename: str = None):
     
     if not os.path.isfile(file_path):
         print(f"File does not exist: {file_path}")
-        raise HTTPException(status_code=404, detail="PDF file not found on server")
+        raise HTTPException(status_code=404, detail="File not found on server")
 
-    # Construct pdf_url
-    pdf_url = f"/pdf/{folder_name}/{file_name}"
-    print(f"Generated PDF URL: {pdf_url}")
+    # Determine file type
+    file_mime = mime.from_file(file_path)
+    valid_mime_types = {
+        "application/pdf": "pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+        "application/msword": "doc"
+    }
+    
+    if file_mime not in valid_mime_types:
+        logger.info(f"Invalid file type: {file_mime}, expected PDF or DOCX or DOC")
+        raise HTTPException(status_code=400, detail="File must be a PDF or DOCX or DOC")
+
+    file_type = valid_mime_types[file_mime]
+
+    # Construct file_url with URL-encoded filename
+    encoded_filename = urllib.parse.quote(file_name)
+    file_url = f"/file/{folder_name}/{encoded_filename}"
+    print(f"Generated file URL: {file_url}")
 
     # Generate JSON data (assuming analyze_json is defined)
     json_data = analyze_json(session_data, report_name)
@@ -1415,7 +1446,8 @@ async def document(req: Request, filename: str = None):
         {
             "request": req,
             "name": full_name,
-            "file_path": pdf_url,
+            "file_path": file_url,
+            "file_type": file_type,
             "output": json_data
         }
     )
