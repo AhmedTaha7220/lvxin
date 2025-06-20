@@ -99,8 +99,8 @@ def generate_message(messages):
     
 
 # 示例用法
-messages = [
-    {"role": "user", "content": "我的车被撞了，给我推荐10个相似案例，请把案例标题、案号以及网上的案例地址也发出来？"}
-]
+# messages = [
+#     {"role": "user", "content": "我的车被撞了，给我推荐10个相似案例，请把案例标题、案号以及网上的案例地址也发出来？"}
+# ]
 
 

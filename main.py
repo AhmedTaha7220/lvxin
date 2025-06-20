@@ -487,16 +487,34 @@ app = FastAPI() # Define your main app
 ht_pages = Jinja2Templates(directory="templates") # Define our html location
 app.mount("/static", StaticFiles(directory="static"), name="static") # Define our additional files location
 
+# @app.get("/pdf/{foldername}/{filename}")
+# def get_pdf(foldername,filename: str):
+#     # Build the full path securely
+#     base_dir = "D:/Main_Project/users"
+#     file_path = os.path.join(base_dir, foldername, filename)
+#     print(file_path)
+#     if not os.path.isfile(file_path):
+#         raise HTTPException(status_code=404, detail="File not found")
+#     return FileResponse(path=file_path, media_type='application/pdf', filename=filename)
 @app.get("/pdf/{foldername}/{filename}")
-def get_pdf(foldername,filename: str):
+async def get_pdf(foldername: str, filename: str):
     # Build the full path securely
-    base_dir = "D:/Main_Project/users"
-    file_path = os.path.join(base_dir, foldername, filename)
-    print(file_path)
+    file_path = os.path.join(USERS_DIR, foldername, filename)
+    print(f"Requested file path: {file_path}")
+    
+    # Normalize path to prevent path traversal issues
+    file_path = os.path.normpath(file_path)
+    
+    # Ensure the file exists
     if not os.path.isfile(file_path):
+        print(f"File not found: {file_path}")
         raise HTTPException(status_code=404, detail="File not found")
-    return FileResponse(path=file_path, media_type='application/pdf', filename=filename)
-
+    
+    return FileResponse(
+        path=file_path,
+        media_type='application/pdf',
+        filename=filename
+    )
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -1310,80 +1328,97 @@ def get_pdf(filename: str):
     return FileResponse(path=file_path, media_type='application/pdf', filename=filename)
 
 
-@app.get("/document",response_class=HTMLResponse)
-async def document(req: Request,filename:str=None):
-        user_id = req.cookies.get("user_id")
+@app.get("/document", response_class=HTMLResponse)
+async def document(req: Request, filename: str = None):
+    user_id = req.cookies.get("user_id")
+    flag = req.cookies.get("flag")
+    print(f"User ID: {user_id}, Flag: {flag}")
+
+    # Fetch user or company data
+    if flag == "0":
         cur.execute("SELECT username, full_name FROM users WHERE user_id = %s", (user_id,))
-        data = cur.fetchone()
-        username=data[0]
-        full_name = data[1]
-        
-        session_data={
-            'user_id':user_id,
-            'username':username
-        }
-        
-        if (filename == None):
+    else:
+        cur.execute("SELECT username, full_name FROM companies WHERE comp_id=%s", (user_id,))
+    
+    data = cur.fetchone()
+    if not data:
+        raise HTTPException(status_code=404, detail="User or company not found")
+    
+    username, full_name = data
+    session_data = {'user_id': user_id, 'username': username}
+    user_folder = os.path.join(USERS_DIR, f"{user_id}_{username}")
+    folder_name = os.path.basename(user_folder)
+
+    # Fetch file details
+    if filename is None:
+        if flag == "0":
             query = """
                 SELECT report_name, file_name
                 FROM files
                 WHERE user_id = %s
                 AND analyzed_at IS NOT NULL
                 ORDER BY analyzed_at DESC
-                LIMIT 1;
+                LIMIT 1
             """
-            
-            # Execute query with user_id
             cur.execute(query, (user_id,))
-            
-            # Fetch the result
-            result = cur.fetchone()
-            
-            if result:
-                # print(f"Report Name: {result['report_name']}")
-                # print(f"File Name: {result['file_name']}")
-                
-                json_data = analyze_json(session_data,result[0])
-                user_folder = os.path.join(USERS_DIR, f"{user_id}_{username}")
-                folder_name = os.path.basename(user_folder)
-                file_path = os.path.join(user_folder, result[1])
-                
-                print(f"The file path is: {file_path}")
-                filename = os.path.basename(file_path)
-                pdf_url = f"/pdf/{folder_name}/{filename}"
-                print(f"The PDF URL is: {pdf_url}")
-                print(f"The JSON data is: {json_data}")
         else:
+            query = """
+                SELECT report_name, file_name
+                FROM comp_files
+                WHERE comp_id = %s
+                AND analyzed_at IS NOT NULL
+                ORDER BY analyzed_at DESC
+                LIMIT 1
+            """
+            cur.execute(query, (user_id,))
+    else:
+        if flag == "0":
             query = """
                 SELECT report_name
                 FROM files
-                WHERE file_name = %s"""
-            # Execute query with user_id
-            cur.execute(query, (filename,))
-            
-            # Fetch the result
-            result = cur.fetchone()
-            report_name=result[0]
-            json_data = analyze_json(session_data,report_name)
-            user_folder = os.path.join(USERS_DIR, f"{user_id}_{username}")
-            folder_name = os.path.basename(user_folder)
-            file_path = os.path.join(user_folder, filename)
-            
-            print(f"The file path is: {file_path}")
-            filename = os.path.basename(file_path)
-            pdf_url = f"/pdf/{folder_name}/{filename}"
-            print(f"The PDF URL is: {pdf_url}")
-            print(f"The JSON data is: {json_data}")
-                
-        return ht_pages.TemplateResponse(
-            "document.html",
-            {
-                "request":req,
-                "name":full_name,
-                "file_path":pdf_url,
-                "output":json_data
-                } # If you have any additional parameters you can add them in this dictionary
-        )
+                WHERE user_id = %s AND file_name = %s
+            """
+            cur.execute(query, (user_id, filename))
+        else:
+            query = """
+                SELECT report_name
+                FROM comp_files
+                WHERE comp_id = %s AND file_name = %s
+            """
+            cur.execute(query, (user_id, filename))
+
+    result = cur.fetchone()
+    if not result:
+        raise HTTPException(status_code=404, detail="File or report not found")
+
+    # Extract report_name and file_name
+    report_name = result[0]
+    file_name = filename if filename else result[1]
+    
+    # Construct file path and validate
+    file_path = os.path.join(user_folder, file_name)
+    print(f"Constructed file path: {file_path}")
+    
+    if not os.path.isfile(file_path):
+        print(f"File does not exist: {file_path}")
+        raise HTTPException(status_code=404, detail="PDF file not found on server")
+
+    # Construct pdf_url
+    pdf_url = f"/pdf/{folder_name}/{file_name}"
+    print(f"Generated PDF URL: {pdf_url}")
+
+    # Generate JSON data (assuming analyze_json is defined)
+    json_data = analyze_json(session_data, report_name)
+
+    return ht_pages.TemplateResponse(
+        "document.html",
+        {
+            "request": req,
+            "name": full_name,
+            "file_path": pdf_url,
+            "output": json_data
+        }
+    )
 
 @app.get("/upload_contract", response_class=HTMLResponse)
 async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
@@ -2069,9 +2104,9 @@ async def chat_endpoint(chat: ChatRequest):
     messages = [{"role": "user", "content": f"彻底分析以下法律问题。一般分析：首先从合法性、谈判原则及[插入国家名称或管辖区]相关法律和司法实践的角度审视该问题。法律依据：列出您在分析中所依赖的所有法律、法规和条款，包括任何相关的国际协议。详细解决方案：提供详细、准确且经过良好构建的解决方案，清晰地逐步分解每一个步骤或论点。风险和警告：识别这种情况下可能出现的任何风险、漏洞或法律后果。总结：以清晰简洁的总结或结论结束您的发现和建议。: {chat.message}"},]
     logger.info(f"The message is: {messages}")
     raw_out = generate_message(messages)
-    with open('Chat_user_output.json', 'w', encoding='utf-8') as f:
-        json.dump(raw_out, f, ensure_ascii=False, indent=4)
+    logger.info(f"I finished chatting the api and this is the raw_out {raw_out}")
     response = extract_and_print_markdown(raw_out)
+    logger.info(f"And this is the response: {response}")
     return {"response": response}
 
 @app.get("/chat", response_class=HTMLResponse)
