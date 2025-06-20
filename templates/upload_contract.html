@@ -228,8 +228,8 @@
     <nav class="sidebar">
         <div class="nav-section">
             <div class="nav-title">合同</div>
-            <a href="mydash" class="nav-item active" > <i class="fas fa-bar-chart"></i> 仪表板 </a>
-            <a href="upload_contract" class="nav-item"> <i class="fas fa-file-upload"></i> 上传合同 </a>
+            <a href="mydash" class="nav-item" > <i class="fas fa-bar-chart"></i> 仪表板 </a>
+            <a href="upload_contract" class="nav-item active"> <i class="fas fa-file-upload"></i> 上传合同 </a>
             <a href="history" class="nav-item"> <i class="fas fa-history"></i> 分析历史 </a>
             <a href="analysis" class="nav-item"> <i class="fas fa-folder-open"></i> 文档分析 </a>
         </div>
@@ -323,40 +323,42 @@
     }
 
     async function handleAnalysis() {
-        if (!fileInput.files.length) {
-            alert('Please select a file first!');
-            return;
-        }
-        
-        analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
-        analyzeBtn.disabled = true;
-        
-        const formData = new FormData();
-        formData.append('file', fileInput.files[0]);
-        
-        try {
-            // Instead of handling the redirect manually, we'll check the response headers
-            // or just let the browser handle the redirect naturally
-            const response = await fetch('/analyze_upload', {
-                method: 'POST',
-                body: formData,
-            });
-            
-            // Your FastAPI endpoint returns a redirect, not JSON
-            // So we shouldn't try to parse response.json()
-            console.log('Response status:', response.status);
-            
-            // If we somehow get here (we shouldn't normally since browser should redirect),
-            // just redirect manually
-            window.location.href = '/loading';
-            
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error: ' + error.message);
-            analyzeBtn.innerHTML = 'Analyze Document';
-            analyzeBtn.disabled = false;
-        }
+    if (!fileInput.files.length) {
+        alert('Please select a file first!');
+        return;
     }
+    
+    analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+    analyzeBtn.disabled = true;
+    
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    
+    try {
+        const response = await fetch('/analyze_upload', {
+            method: 'POST',
+            body: formData,
+        });
+        
+        if (response.redirected) {
+            // Browser will automatically follow the redirect
+            window.location.href = response.url;
+        } else if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        } else {
+            // Handle non-redirect success case if needed
+            console.log('Analysis complete, no redirect');
+            window.location.href = '/upload_contract'; // Fallback if no redirect
+        }
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error: ' + error.message);
+    } finally {
+        analyzeBtn.innerHTML = 'Analyze Document';
+        analyzeBtn.disabled = false;
+    }
+}
 </script>
 <!-- Footer -->
 </body>

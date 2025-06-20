@@ -257,56 +257,10 @@
                     <input type="text" id="email" name="email" value="{{email}}" readonly>
                 </div>
                 <div class="form-group">
-                    <label for="age">年龄</label>
-                    <input type="number" id="age" name="age" value="{{age}}" required>
-                </div>
-                <div class="form-group">
-                    <label for="language">语言</label>
-                    <input type="text" id="language" name="language" list="language-options" placeholder="选择或输入" value="{{language}}">
-                    <datalist id="language-options">
-                        <option value="中文（简体）"></option>
-                        <option value="中文（繁体）"></option>
-                        <option value="英文"></option>
-                        <option value="日文"></option>
-                        <option value="韩文"></option>
-                        <option value="法文"></option>
-                        <option value="德文"></option>
-                        <option value="西班牙文"></option>
-                        <option value="俄文"></option>
-                        <option value="阿拉伯文"></option>
-                        <option value="其他（请注明）"></option>
-                    </datalist>
-                </div>
-                <div class="form-group">
-                    <label for="country">国家</label>
-                    <input type="text" id="country" name="country" list="country-options" placeholder="选择或输入" value="{{country}}">
-                    <datalist id="country-options">
-                        <option value="中国大陆"></option>
-                        <option value="香港特别行政区"></option>
-                        <option value="澳门特别行政区"></option>
-                        <option value="台湾"></option>
-                        <option value="日本"></option>
-                        <option value="韩国"></option>
-                        <option value="新加坡"></option>
-                        <option value="美国"></option>
-                        <option value="英国"></option>
-                        <option value="澳大利亚"></option>
-                        <option value="加拿大"></option>
-                        <option value="德国"></option>
-                        <option value="法国"></option>
-                        <option value="埃及"></option>
-                        <option value="沙特阿拉伯"></option>
-                        <option value="其他欧盟国家"></option>
-                        <option value="其他亚洲国家"></option>
-                        <option value="其他中东国家"></option>
-                        <option value="其他（请输入您的国家）"></option>
-                    </datalist>
-                </div>
-                <div class="form-group">
                     <label>电话号码</label>
                     <input type="tel" id="user_phone" name="user_phone" value="{{phone}}">
                 </div>
-                                <div class="form-group">
+                <div class="form-group">
                     <label>当前密码</label>
                     <input type="password" id="current_password" name="current_password" required>
                 </div>
@@ -330,15 +284,12 @@ document.getElementById('profileForm').addEventListener('submit', async function
     const data = {
         full_name: document.getElementById('full_name').value,
         email: document.getElementById('email').value,
-        age: parseInt(document.getElementById('age').value),
-        language: document.getElementById('language').value,
-        country: document.getElementById('country').value,
         user_phone: document.getElementById('user_phone').value,
         current_password: document.getElementById('current_password').value,
         new_password: document.getElementById('new_password').value
     };
     try {
-        const response = await fetch('/profile_changes', {
+        const response = await fetch('/profile', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
